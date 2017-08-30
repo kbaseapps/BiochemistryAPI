@@ -60,7 +60,9 @@ class BiochemistryAPI:
         :param dialect: excel-tab for TSV or excel for CSV
         :return:
         """
-        reader = csv.DictReader(path, dialect=dialect)
+        if not os.path.exists(path):
+            raise ValueError("File not found: {}".format(path))
+        reader = csv.DictReader(open(path), dialect=dialect)
         return dict([(x[key], x) for x in reader])
 
     #END_CLASS_HEADER
@@ -75,7 +77,8 @@ class BiochemistryAPI:
         self.ws_client = Workspace(self.callback_url)
         self.compounds = self.dict_from_file("/kb/module/data/compounds.tsv")
         self.reactions = self.dict_from_file("/kb/module/data/reactions.tsv")
-
+        print("Loaded {} compounds and {} reactions".format(
+            len(self.compounds), len(self.reactions)))
         #END_CONSTRUCTOR
         pass
 
@@ -148,7 +151,7 @@ class BiochemistryAPI:
         # return variables are: out_compounds
         #BEGIN get_compounds
         self._check_param(input, ['compounds'])
-        out_compounds = [self.reactions.get(x, None) for x in
+        out_compounds = [self.compounds.get(x) for x in
                          input['compounds']]
         #END get_compounds
 

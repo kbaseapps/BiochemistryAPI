@@ -75,15 +75,23 @@ class BiochemistryAPITest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
-    # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
-        pass
+    def test_get_compounds(self):
+        cpds = self.getImpl().get_compounds(self.ctx, {"compounds":
+                                            ["cpd00011", 'cpd00002',
+                                             "cpd00007"]})[0]
+        assert len(cpds) == 3
+        assert cpds[0]['id'] == 'cpd00011'
+        missing_col = {'name', 'formula', 'charge', 'deltaG', 'deltaGErr',
+                       'abbrev', 'aliases'} - set(cpds[0].keys())
+        if missing_col:
+            raise AssertionError("Missing Columns:", missing_col)
+
+    def test_get_reactions(self):
+        rxns = self.getImpl().get_reactions(self.ctx, {"reactions":
+                                            ["rxn00011", 'rxn00002',
+                                             "rxn00007"]})[0]
+        assert len(rxns) == 3
+        assert rxns[0]['id'] == 'rxn00011'
+        missing_col = {'name', 'direction'} - set(rxns[0].keys())
+        if missing_col:
+            raise AssertionError("Missing Columns:", missing_col)
