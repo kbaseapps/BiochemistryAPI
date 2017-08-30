@@ -2,7 +2,6 @@
 #BEGIN_HEADER
 import os
 import csv
-from Workspace.WorkspaceClient import Workspace
 #END_HEADER
 
 
@@ -40,18 +39,6 @@ class BiochemistryAPI:
                 print(
                     "WARNING: received unexpected parameter {}".format(param))
 
-    def dict_from_ws(self, object_name='default', ws_name='kbase', key="id"):
-        """
-        Build a dictionary from an object array in a workspace
-        :param object_name: name of the object array
-        :param ws_name: name of the workspace
-        :param key: what field should be used as the key
-        :return: dictionary
-        """
-        ret = self.ws_client.get_objects2([
-            {'name': object_name, 'workspace': ws_name}])[0]
-        return dict([(x[key], x) for x in ret['data']])
-
     def dict_from_file(self, path, key='id', dialect='excel-tab'):
         """
         Build a dictionary from an object array in a file
@@ -73,8 +60,6 @@ class BiochemistryAPI:
         #BEGIN_CONSTRUCTOR
         self.config = config
         self.scratch = config['scratch']
-        self.callback_url = os.environ['SDK_CALLBACK_URL']
-        self.ws_client = Workspace(self.callback_url)
         self.compounds = self.dict_from_file("/kb/module/data/compounds.tsv")
         self.reactions = self.dict_from_file("/kb/module/data/reactions.tsv")
         print("Loaded {} compounds and {} reactions".format(
