@@ -1,4 +1,4 @@
 test_local
 sdk.cfg
 .DS_Store
-.idea
+.idea/**

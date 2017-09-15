@@ -77,10 +77,11 @@ class BiochemistryAPITest(unittest.TestCase):
 
     def test_get_compounds(self):
         cpds = self.getImpl().get_compounds(self.ctx, {"compounds":
-                                            ["cpd00011", 'cpd00002',
-                                             "cpd00007"]})[0]
+                                            ["48/1/1/compounds/id/cpd00011",
+                                             'cpd00002', "cpd00007"]})[0]
         assert len(cpds) == 3
         assert cpds[0]['id'] == 'cpd00011'
+        assert cpds[1]['id'] == 'cpd00002'
         missing_col = {'name', 'formula', 'charge', 'deltaG', 'deltaGErr',
                        'abbrev', 'aliases'} - set(cpds[0].keys())
         if missing_col:
@@ -88,10 +89,11 @@ class BiochemistryAPITest(unittest.TestCase):
 
     def test_get_reactions(self):
         rxns = self.getImpl().get_reactions(self.ctx, {"reactions":
-                                            ["rxn00011", 'rxn00002',
-                                             "rxn00007"]})[0]
+                                            ["48/1/1/reactions/id/rxn00011",
+                                             'rxn00002', "rxn00007"]})[0]
         assert len(rxns) == 3
         assert rxns[0]['id'] == 'rxn00011'
+        assert rxns[1]['id'] == 'rxn00002'
         missing_col = {'name', 'direction'} - set(rxns[0].keys())
         if missing_col:
             raise AssertionError("Missing Columns:", missing_col)

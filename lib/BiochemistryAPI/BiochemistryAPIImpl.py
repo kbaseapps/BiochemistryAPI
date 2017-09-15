@@ -98,7 +98,7 @@ class BiochemistryAPI:
         # return variables are: out_reactions
         #BEGIN get_reactions
         self._check_param(input, ['reactions'])
-        out_reactions = [self.reactions.get(x, None) for x in
+        out_reactions = [self.reactions.get(x.split('/')[-1], None) for x in
                          input['reactions']]
         #END get_reactions
 
@@ -136,7 +136,7 @@ class BiochemistryAPI:
         # return variables are: out_compounds
         #BEGIN get_compounds
         self._check_param(input, ['compounds'])
-        out_compounds = [self.compounds.get(x) for x in
+        out_compounds = [self.compounds.get(x.split('/')[-1]) for x in
                          input['compounds']]
         #END get_compounds
 
