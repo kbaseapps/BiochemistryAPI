@@ -1,17 +1,20 @@
 FROM kbase/kbase:sdkbase.latest
 MAINTAINER KBase Developer
 # -----------------------------------------
-# In this section, you can install any system dependencies required
-# to run your App.  For instance, you could place an apt-get update or
-# install line here, a git checkout to download code, or run any other
-# installation scripts.
-
-# RUN apt-get update
+# overriding default python to get me anaconda goodness for installing rdkit
+ENV PATH /opt/conda/bin:$PATH
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda2-4.3.27-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh
+RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
+    conda install -y nose \
+                     cairo \
+                     nomkl \
+                     rdkit
 
 # Here we install a python coverage tool and an
 # https library that is out of date in the base image.
-
-RUN pip install coverage
 
 # update security libraries in the base image
 RUN pip install cffi --upgrade \
