@@ -20,9 +20,9 @@ class BiochemistryAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.1"
-    GIT_URL = ""
-    GIT_COMMIT_HASH = ""
+    VERSION = "0.1.1"
+    GIT_URL = "git@github.com:kbaseapps/BiochemistryAPI.git"
+    GIT_COMMIT_HASH = "b82efb604f55537e62cdf2bc8960369a8c640d27"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -68,10 +68,10 @@ class BiochemistryAPI:
         pass
 
 
-    def get_reactions(self, ctx, input):
+    def get_reactions(self, ctx, params):
         """
         Returns data for the requested reactions
-        :param input: instance of type "get_reactions_params" (Input
+        :param params: instance of type "get_reactions_params" (Input
            parameters for the "get_reactions" function. list<reaction_id>
            reactions - a list of the reaction IDs for the reactions to be
            returned (a required argument)) -> structure: parameter
@@ -97,9 +97,9 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: out_reactions
         #BEGIN get_reactions
-        self._check_param(input, ['reactions'])
+        self._check_param(params, ['reactions'])
         out_reactions = [self.reactions.get(x.split('/')[-1], None) for x in
-                         input['reactions']]
+                         params['reactions']]
         #END get_reactions
 
         # At some point might do deeper type checking...
@@ -109,10 +109,10 @@ class BiochemistryAPI:
         # return the results
         return [out_reactions]
 
-    def get_compounds(self, ctx, input):
+    def get_compounds(self, ctx, params):
         """
         Returns data for the requested compounds
-        :param input: instance of type "get_compounds_params" (Input
+        :param params: instance of type "get_compounds_params" (Input
            parameters for the "get_compounds" function. list<compound_id>
            compounds - a list of the compound IDs for the compounds to be
            returned (a required argument)) -> structure: parameter
@@ -135,9 +135,9 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: out_compounds
         #BEGIN get_compounds
-        self._check_param(input, ['compounds'])
+        self._check_param(params, ['compounds'])
         out_compounds = [self.compounds.get(x.split('/')[-1]) for x in
-                         input['compounds']]
+                         params['compounds']]
         #END get_compounds
 
         # At some point might do deeper type checking...
@@ -146,6 +146,25 @@ class BiochemistryAPI:
                              'out_compounds is not type list as required.')
         # return the results
         return [out_compounds]
+
+    def depict_compounds(self, ctx, params):
+        """
+        Returns a list of depictions for the compound_structures in SVG format
+        :param params: instance of type "depict_compounds_params" ->
+           structure: parameter "compound_structures" of list of String
+        :returns: instance of list of String
+        """
+        # ctx is the context object
+        # return variables are: depictions
+        #BEGIN depict_compounds
+        #END depict_compounds
+
+        # At some point might do deeper type checking...
+        if not isinstance(depictions, list):
+            raise ValueError('Method depict_compounds return value ' +
+                             'depictions is not type list as required.')
+        # return the results
+        return [depictions]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

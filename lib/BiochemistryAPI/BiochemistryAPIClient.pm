@@ -110,7 +110,7 @@ sub new
 
 =head2 get_reactions
 
-  $out_reactions = $obj->get_reactions($input)
+  $out_reactions = $obj->get_reactions($params)
 
 =over 4
 
@@ -119,7 +119,7 @@ sub new
 =begin html
 
 <pre>
-$input is a BiochemistryAPI.get_reactions_params
+$params is a BiochemistryAPI.get_reactions_params
 $out_reactions is a reference to a list where each element is a BiochemistryAPI.Reaction
 get_reactions_params is a reference to a hash where the following keys are defined:
 	reactions has a value which is a reference to a list where each element is a BiochemistryAPI.reaction_id
@@ -142,7 +142,7 @@ Reaction is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$input is a BiochemistryAPI.get_reactions_params
+$params is a BiochemistryAPI.get_reactions_params
 $out_reactions is a reference to a list where each element is a BiochemistryAPI.Reaction
 get_reactions_params is a reference to a hash where the following keys are defined:
 	reactions has a value which is a reference to a list where each element is a BiochemistryAPI.reaction_id
@@ -182,10 +182,10 @@ Returns data for the requested reactions
 							       "Invalid argument count for function get_reactions (received $n, expecting 1)");
     }
     {
-	my($input) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_reactions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -220,7 +220,7 @@ Returns data for the requested reactions
 
 =head2 get_compounds
 
-  $out_compounds = $obj->get_compounds($input)
+  $out_compounds = $obj->get_compounds($params)
 
 =over 4
 
@@ -229,7 +229,7 @@ Returns data for the requested reactions
 =begin html
 
 <pre>
-$input is a BiochemistryAPI.get_compounds_params
+$params is a BiochemistryAPI.get_compounds_params
 $out_compounds is a reference to a list where each element is a BiochemistryAPI.Compound
 get_compounds_params is a reference to a hash where the following keys are defined:
 	compounds has a value which is a reference to a list where each element is a BiochemistryAPI.compound_id
@@ -250,7 +250,7 @@ Compound is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$input is a BiochemistryAPI.get_compounds_params
+$params is a BiochemistryAPI.get_compounds_params
 $out_compounds is a reference to a list where each element is a BiochemistryAPI.Compound
 get_compounds_params is a reference to a hash where the following keys are defined:
 	compounds has a value which is a reference to a list where each element is a BiochemistryAPI.compound_id
@@ -288,10 +288,10 @@ Returns data for the requested compounds
 							       "Invalid argument count for function get_compounds (received $n, expecting 1)");
     }
     {
-	my($input) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_compounds:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -318,6 +318,92 @@ Returns data for the requested compounds
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_compounds",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_compounds',
+				       );
+    }
+}
+ 
+
+
+=head2 depict_compounds
+
+  $depictions = $obj->depict_compounds($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a BiochemistryAPI.depict_compounds_params
+$depictions is a reference to a list where each element is a string
+depict_compounds_params is a reference to a hash where the following keys are defined:
+	compound_structures has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a BiochemistryAPI.depict_compounds_params
+$depictions is a reference to a list where each element is a string
+depict_compounds_params is a reference to a hash where the following keys are defined:
+	compound_structures has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+Returns a list of depictions for the compound_structures in SVG format
+
+=back
+
+=cut
+
+ sub depict_compounds
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function depict_compounds (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to depict_compounds:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'depict_compounds');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "BiochemistryAPI.depict_compounds",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'depict_compounds',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method depict_compounds",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'depict_compounds',
 				       );
     }
 }
@@ -365,16 +451,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'get_compounds',
+                method_name => 'depict_compounds',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method get_compounds",
+            error => "Error invoking method depict_compounds",
             status_line => $self->{client}->status_line,
-            method_name => 'get_compounds',
+            method_name => 'depict_compounds',
         );
     }
 }
@@ -660,6 +746,36 @@ compounds has a value which is a reference to a list where each element is a Bio
 
 a reference to a hash where the following keys are defined:
 compounds has a value which is a reference to a list where each element is a BiochemistryAPI.compound_id
+
+
+=end text
+
+=back
+
+
+
+=head2 depict_compounds_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+compound_structures has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+compound_structures has a value which is a reference to a list where each element is a string
 
 
 =end text
