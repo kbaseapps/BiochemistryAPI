@@ -2,6 +2,7 @@
 #BEGIN_HEADER
 import os
 import csv
+from BiochemistryAPI.utils import depict_compound
 #END_HEADER
 
 
@@ -157,6 +158,9 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: depictions
         #BEGIN depict_compounds
+        self._check_param(params, ['structures'])
+        depictions = [depict_compound(struct)
+                      for struct in params['structures']]
         #END depict_compounds
 
         # At some point might do deeper type checking...

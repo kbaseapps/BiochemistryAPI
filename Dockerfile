@@ -22,13 +22,16 @@ RUN pip install cffi --upgrade \
     && pip install ndg-httpsclient --upgrade \
     && pip install pyasn1 --upgrade \
     && pip install requests --upgrade \
-    && pip install 'requests[security]' --upgrade
+    && pip install 'requests[security]' --upgrade \
+    && pip install jinja2 \
+    && pip install JSONRPCBase
 
 # -----------------------------------------
 
 COPY ./ /kb/module
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
+RUN rm /kb/runtime/bin/python
 
 WORKDIR /kb/module
 

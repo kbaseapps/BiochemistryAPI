@@ -97,3 +97,9 @@ class BiochemistryAPITest(unittest.TestCase):
         missing_col = {'name', 'direction'} - set(rxns[0].keys())
         if missing_col:
             raise AssertionError("Missing Columns:", missing_col)
+
+    def test_depict_compounds(self):
+        svgs = self.getImpl().depict_compounds(
+            self.ctx, {'structures': ['C(=O)O', 'CCC']})[0]
+        assert len(svgs) == 2
+        assert '<svg' in svgs[0]
