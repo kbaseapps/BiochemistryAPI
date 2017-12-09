@@ -3,6 +3,7 @@
 import os
 import csv
 from BiochemistryAPI.utils import depict_compound
+from collections import defaultdict
 #END_HEADER
 
 
@@ -40,7 +41,8 @@ class BiochemistryAPI:
                 print(
                     "WARNING: received unexpected parameter {}".format(param))
 
-    def dict_from_file(self, path, key='id', dialect='excel-tab'):
+    @staticmethod
+    def dict_from_file(path, key='id', dialect='excel-tab'):
         """
         Build a dictionary from an object array in a file
         :param path: local path to object
@@ -53,6 +55,26 @@ class BiochemistryAPI:
         reader = csv.DictReader(open(path), dialect=dialect)
         return dict([(x[key], x) for x in reader])
 
+    @staticmethod
+    def alias_dict_from_file(path, dialect='excel-tab'):
+        """
+        Build a dictionary from an object array in a file
+        :param path: local path to object
+        :param dialect: excel-tab for TSV or excel for CSV
+        :return:
+        """
+        alias_mappings = defaultdict(list)
+        with open(path) as infile:
+            r = csv.DictReader(infile, dialect=dialect)
+            for line in r:
+                for seed_id in line['MS ID'].split('|'):
+                    if line['Source'] == 'Enzyme Class':
+                        alias_mappings[seed_id].append(line['External ID'])
+                    else:
+                        alias_mappings[seed_id].append('%s:%s' % (
+                            line['Source'].strip(), line['External ID']))
+        return alias_mappings
+
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -61,8 +83,15 @@ class BiochemistryAPI:
         #BEGIN_CONSTRUCTOR
         self.config = config
         self.scratch = config['scratch']
-        self.compounds = self.dict_from_file("/kb/module/data/compounds.tsv")
-        self.reactions = self.dict_from_file("/kb/module/data/reactions.tsv")
+        data_dir = '/kb/module/data/'
+        self.compounds = self.dict_from_file(data_dir + "compounds.tsv")
+        self.reactions = self.dict_from_file(data_dir + "reactions.tsv")
+        self.comp_aliases = self.alias_dict_from_file(data_dir +
+                                                      "Compounds_Aliases.tsv")
+        self.rxn_aliases = self.alias_dict_from_file(data_dir +
+                                                      "Reactions_Aliases.tsv")
+        self.ec_classes = self.alias_dict_from_file(data_dir + 'Enzyme_Class_Reactions_Aliases.tsv')
+
         print("Loaded {} compounds and {} reactions".format(
             len(self.compounds), len(self.reactions)))
         #END_CONSTRUCTOR
@@ -99,8 +128,14 @@ class BiochemistryAPI:
         # return variables are: out_reactions
         #BEGIN get_reactions
         self._check_param(params, ['reactions'])
-        out_reactions = [self.reactions.get(x.split('/')[-1], None) for x in
-                         params['reactions']]
+        out_reactions = []
+        for x in params['reactions']:
+            id = x.split('/')[-1]
+            rxn = self.reactions.get(id, None)
+            if rxn:
+                rxn['aliases'] = self.rxn_aliases.get(id, '')
+                rxn['enzymes'] = self.ec_classes.get(id, '')
+            out_reactions.append(rxn)
         #END get_reactions
 
         # At some point might do deeper type checking...
@@ -137,8 +172,13 @@ class BiochemistryAPI:
         # return variables are: out_compounds
         #BEGIN get_compounds
         self._check_param(params, ['compounds'])
-        out_compounds = [self.compounds.get(x.split('/')[-1]) for x in
-                         params['compounds']]
+        out_compounds = []
+        for x in params['compounds']:
+            id = x.split('/')[-1]
+            comp = self.compounds.get(id, None)
+            if comp:
+                comp['aliases'] = self.comp_aliases.get(id, '')
+            out_compounds.append(comp)
         #END get_compounds
 
         # At some point might do deeper type checking...
