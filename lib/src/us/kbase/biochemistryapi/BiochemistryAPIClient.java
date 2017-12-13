@@ -167,14 +167,14 @@ public class BiochemistryAPIClient {
      * <pre>
      * Returns data for the requested reactions
      * </pre>
-     * @param   input   instance of type {@link us.kbase.biochemistryapi.GetReactionsParams GetReactionsParams} (original type "get_reactions_params")
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.GetReactionsParams GetReactionsParams} (original type "get_reactions_params")
      * @return   parameter "out_reactions" of list of type {@link us.kbase.biochemistryapi.Reaction Reaction}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public List<Reaction> getReactions(GetReactionsParams input, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public List<Reaction> getReactions(GetReactionsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
-        args.add(input);
+        args.add(params);
         TypeReference<List<List<Reaction>>> retType = new TypeReference<List<List<Reaction>>>() {};
         List<List<Reaction>> res = caller.jsonrpcCall("BiochemistryAPI.get_reactions", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
@@ -185,16 +185,34 @@ public class BiochemistryAPIClient {
      * <pre>
      * Returns data for the requested compounds
      * </pre>
-     * @param   input   instance of type {@link us.kbase.biochemistryapi.GetCompoundsParams GetCompoundsParams} (original type "get_compounds_params")
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.GetCompoundsParams GetCompoundsParams} (original type "get_compounds_params")
      * @return   parameter "out_compounds" of list of type {@link us.kbase.biochemistryapi.Compound Compound}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public List<Compound> getCompounds(GetCompoundsParams input, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public List<Compound> getCompounds(GetCompoundsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
-        args.add(input);
+        args.add(params);
         TypeReference<List<List<Compound>>> retType = new TypeReference<List<List<Compound>>>() {};
         List<List<Compound>> res = caller.jsonrpcCall("BiochemistryAPI.get_compounds", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: depict_compounds</p>
+     * <pre>
+     * Returns a list of depictions for the compound_structures in SVG format
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.DepictCompoundsParams DepictCompoundsParams} (original type "depict_compounds_params")
+     * @return   parameter "depictions" of list of String
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public List<String> depictCompounds(DepictCompoundsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.depict_compounds", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

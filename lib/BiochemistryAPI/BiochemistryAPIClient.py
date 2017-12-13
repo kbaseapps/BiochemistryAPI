@@ -33,10 +33,10 @@ class BiochemistryAPI(object):
             trust_all_ssl_certificates=trust_all_ssl_certificates,
             auth_svc=auth_svc)
 
-    def get_reactions(self, input, context=None):
+    def get_reactions(self, params, context=None):
         """
         Returns data for the requested reactions
-        :param input: instance of type "get_reactions_params" (Input
+        :param params: instance of type "get_reactions_params" (Input
            parameters for the "get_reactions" function. list<reaction_id>
            reactions - a list of the reaction IDs for the reactions to be
            returned (a required argument)) -> structure: parameter
@@ -61,12 +61,12 @@ class BiochemistryAPI(object):
         """
         return self._client.call_method(
             'BiochemistryAPI.get_reactions',
-            [input], self._service_ver, context)
+            [params], self._service_ver, context)
 
-    def get_compounds(self, input, context=None):
+    def get_compounds(self, params, context=None):
         """
         Returns data for the requested compounds
-        :param input: instance of type "get_compounds_params" (Input
+        :param params: instance of type "get_compounds_params" (Input
            parameters for the "get_compounds" function. list<compound_id>
            compounds - a list of the compound IDs for the compounds to be
            returned (a required argument)) -> structure: parameter
@@ -88,7 +88,18 @@ class BiochemistryAPI(object):
         """
         return self._client.call_method(
             'BiochemistryAPI.get_compounds',
-            [input], self._service_ver, context)
+            [params], self._service_ver, context)
+
+    def depict_compounds(self, params, context=None):
+        """
+        Returns a list of depictions for the compound_structures in SVG format
+        :param params: instance of type "depict_compounds_params" ->
+           structure: parameter "compound_structures" of list of String
+        :returns: instance of list of String
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.depict_compounds',
+            [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('BiochemistryAPI.status',

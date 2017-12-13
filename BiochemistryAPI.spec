@@ -72,7 +72,7 @@ module BiochemistryAPI {
     /*
     	Returns data for the requested reactions
     */
-    funcdef get_reactions(get_reactions_params input) returns (list<Reaction> out_reactions) authentication required;
+    funcdef get_reactions(get_reactions_params params) returns (list<Reaction> out_reactions) authentication required;
 
 	/*
 	    Input parameters for the "get_compounds" function.
@@ -84,6 +84,15 @@ module BiochemistryAPI {
     /*
     	Returns data for the requested compounds
     */
-    funcdef get_compounds(get_compounds_params input) returns (list<Compound> out_compounds) authentication required;
+    funcdef get_compounds(get_compounds_params params) returns (list<Compound> out_compounds) authentication required;
+
+    typedef structure {
+		list<string> compound_structures;
+    } depict_compounds_params;
+    /*
+    	Returns a list of depictions for the compound_structures in SVG format
+    */
+    funcdef depict_compounds(depict_compounds_params params) returns (list<string> depictions) authentication required;
+
 
 };
