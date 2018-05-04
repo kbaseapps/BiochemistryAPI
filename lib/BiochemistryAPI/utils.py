@@ -10,8 +10,7 @@ from rdkit.DataStructs import FingerprintSimilarity
 
 rdk_lg = RDLogger.logger()
 rdk_lg.setLevel(RDLogger.CRITICAL)
-log = logging.getLogger('BiochemistryAPILog')
-
+logging.basicConfig(level=logging.INFO)
 
 def check_param(in_params, req_param, opt_param=list()):
     """
@@ -23,7 +22,7 @@ def check_param(in_params, req_param, opt_param=list()):
     defined_param = set(req_param + opt_param)
     for param in in_params:
         if param not in defined_param:
-            log.warning("WARNING: received unexpected parameter {}".format(param))
+            logging.warning("Received unexpected parameter {}".format(param))
 
 
 def dict_from_file(path, key='id', dialect='excel-tab'):
@@ -82,6 +81,8 @@ def substructure_search(query, structures):
 def similarity_search(query, structures, fp_type='maccs', min_similarity=0.8):
     """Perform return compound ids where tanimoto similarity of fingerprint 'fp_type is greater
     than 'min_similarity'"""
+    if not isinstance(min_similarity, float) or not 0 <= min_similarity <= 1.0:
+        raise ValueError('Invalid min_similarity. Value must be a float between 0 and 1.')
     if fp_type.lower() == 'maccs':
         fp1 = AllChem.GetMACCSKeysFingerprint(_get_mol(query))
         return [x.id for x in structures

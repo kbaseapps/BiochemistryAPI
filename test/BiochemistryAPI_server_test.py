@@ -103,9 +103,15 @@ class BiochemistryAPITest(unittest.TestCase):
         with self.assertRaisesRegexp(ValueError, 'parameter is required'):
             self.getImpl().substructure_search(self.ctx, {})
         with self.assertRaisesRegexp(ValueError, 'parameter is required'):
-            self.getImpl().substructure_search(self.ctx, {})
+            self.getImpl().similarity_search(self.ctx, {})
         with self.assertRaisesRegexp(ValueError, 'parameter is required'):
             self.getImpl().depict_compounds(self.ctx, {})
+        with self.assertRaisesRegexp(ValueError, 'Invalid fingerprint type'):
+            self.getImpl().similarity_search(self.ctx, {'query': 'C(=O)O', 'fp_type': 'foo'})
+        with self.assertRaisesRegexp(ValueError, 'Invalid min_similarity'):
+            self.getImpl().similarity_search(self.ctx, {'query': 'C', 'min_similarity': 1.1})
+        with self.assertRaisesRegexp(ValueError, 'Invalid min_similarity'):
+            self.getImpl().similarity_search(self.ctx, {'query': 'C', 'min_similarity': '0.8'})
 
     def test_get_compounds(self):
         cpds = self.getImpl().get_compounds(self.ctx, {"compounds":
@@ -142,8 +148,9 @@ class BiochemistryAPITest(unittest.TestCase):
         self.assertEqual(ids[0], 'cpd00017')
 
     def test_similarity_search(self):
-        ids = self.getImpl().similarity_search(self.ctx, {'query': 'C(=O)O'})[0]
-        self.assertEqual(len(ids), 3)
+        ids = self.getImpl().similarity_search(
+            self.ctx, {'query': 'InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)'})[0]
+        self.assertEqual(len(ids), 4)
         self.assertEqual(ids[0], 'cpd00029')
 
         ids = self.getImpl().similarity_search(self.ctx, {'query': 'C(=O)O', "fp_type": "RDKit",
@@ -153,6 +160,6 @@ class BiochemistryAPITest(unittest.TestCase):
 
     def test_depict_compounds(self):
         svgs = self.getImpl().depict_compounds(
-            self.ctx, {'structures': ['C(=O)O', 'CCC']})[0]
+            self.ctx, {'structures': ['C(=O)O', 'InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)']})[0]
         assert len(svgs) == 2
         assert '<svg' in svgs[0]

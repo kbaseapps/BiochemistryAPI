@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
+import logging
+
 from BiochemistryAPI import utils
+
+logging.basicConfig(level=logging.INFO)
 #END_HEADER
 
 
@@ -43,10 +47,10 @@ class BiochemistryAPI:
                                                       "Reactions_Aliases.tsv")
         self.ec_classes = utils.alias_dict_from_file(data_dir + 'Enzyme_Class_Reactions_Aliases.tsv')
 
-        utils.log.info("Loaded {} compounds and {} reactions".format(
+        logging.info("Loaded {} compounds and {} reactions".format(
             len(self.compounds), len(self.reactions)))
         self.structures = utils.make_mol_tuples(self.compounds.values())
-        utils.log.info("Cached compound structures")
+        logging.info("Cached compound structures")
         #END_CONSTRUCTOR
         pass
 
@@ -79,8 +83,8 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: out_reactions
         #BEGIN get_reactions
-        utils.log.info("Starting get_reactions")
-        utils.log.info("Params: {}".format(params))
+        logging.info("Starting get_reactions")
+        logging.info("Params: {}".format(params))
         utils.check_param(params, ['reactions'])
         out_reactions = []
         for x in params['reactions']:
@@ -125,8 +129,8 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: out_compounds
         #BEGIN get_compounds
-        utils.log.info("Starting get_compounds")
-        utils.log.info("Params: {}".format(params))
+        logging.info("Starting get_compounds")
+        logging.info("Params: {}".format(params))
         utils.check_param(params, ['compounds'])
         out_compounds = []
         for x in params['compounds']:
@@ -155,8 +159,8 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: matching_ids
         #BEGIN substructure_search
-        utils.log.info("Starting substructure_search")
-        utils.log.info("Params: {}".format(params))
+        logging.info("Starting substructure_search")
+        logging.info("Params: {}".format(params))
         utils.check_param(params, ['query'])
         matching_ids = utils.substructure_search(params['query'], self.structures)
         #END substructure_search
@@ -182,8 +186,8 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: matching_ids
         #BEGIN similarity_search
-        utils.log.info("Starting similarity_search")
-        utils.log.info("Params: {}".format(params))
+        logging.info("Starting similarity_search")
+        logging.info("Params: {}".format(params))
         utils.check_param(params, ['query'], ['fp_type', 'min_similarity'])
         params['structures'] = self.structures
         matching_ids = utils.similarity_search(**params)
@@ -206,8 +210,8 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: depictions
         #BEGIN depict_compounds
-        utils.log.info("Starting depict_compounds")
-        utils.log.info("Params: {}".format(params))
+        logging.info("Starting depict_compounds")
+        logging.info("Params: {}".format(params))
         utils.check_param(params, ['structures'])
         depictions = [utils.depict_compound(struct) for struct in params['structures']]
         #END depict_compounds
