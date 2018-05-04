@@ -1,18 +1,6 @@
-FROM kbase/kbase:sdkbase.latest
+FROM kbase/kbase:sdkbase2.latest
 MAINTAINER KBase Developer
 # -----------------------------------------
-
-# Here we install a python coverage tool and an
-# https library that is out of date in the base image.
-
-# update security libraries in the base image
-RUN pip install setuptools --upgrade \
-    && pip install cffi --upgrade \
-    && pip install pyopenssl --upgrade \
-    && pip install ndg-httpsclient --upgrade \
-    && pip install pyasn1 --upgrade \
-    && pip install requests --upgrade \
-    && pip install 'requests[security]' --upgrade
 
 # -----------------------------------------
 # download and use conda to install rdkit and add the installed libs to the paths

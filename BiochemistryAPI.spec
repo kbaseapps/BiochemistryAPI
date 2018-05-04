@@ -87,6 +87,31 @@ module BiochemistryAPI {
     funcdef get_compounds(get_compounds_params params) returns (list<Compound> out_compounds) authentication required;
 
     typedef structure {
+		string query;
+    } substructure_search_params;
+    /*
+    	Returns compound ids for compounds that contain the query substructure
+    */
+    funcdef substructure_search(substructure_search_params params) returns (list<compound_id> matching_ids) authentication required;
+
+    /*
+        string query: Either InChI or SMILES string
+		string fp_type: Either MACCS or Morgan fingerprints
+		float min_similarity: In range 0-1
+    */
+
+    typedef structure {
+		string query;
+		string fp_type;
+		float min_similarity;
+    } similarity_search_params;
+    /*
+    	Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+    */
+    funcdef similarity_search(similarity_search_params params) returns (list<compound_id> matching_ids) authentication required;
+
+
+    typedef structure {
 		list<string> compound_structures;
     } depict_compounds_params;
     /*

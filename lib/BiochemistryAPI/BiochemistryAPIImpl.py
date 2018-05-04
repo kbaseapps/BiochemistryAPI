@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import os
-import csv
-from BiochemistryAPI.utils import depict_compound
-from collections import defaultdict
+from BiochemistryAPI import utils
 #END_HEADER
 
 
@@ -22,58 +19,11 @@ class BiochemistryAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.1.1"
-    GIT_URL = "git@github.com:kbaseapps/BiochemistryAPI.git"
-    GIT_COMMIT_HASH = "b82efb604f55537e62cdf2bc8960369a8c640d27"
+    VERSION = "0.1.2"
+    GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
+    GIT_COMMIT_HASH = "15eb8ad3e8aa95eb2f632cbfe0b96199c50e97c5"
 
     #BEGIN_CLASS_HEADER
-    @staticmethod
-    def _check_param(in_params, req_param, opt_param=list()):
-        """
-        Check if each of the params in the list are in the input params
-        """
-        for param in req_param:
-            if param not in in_params:
-                raise ValueError('{} parameter is required'.format(param))
-        defined_param = set(req_param + opt_param)
-        for param in in_params:
-            if param not in defined_param:
-                print(
-                    "WARNING: received unexpected parameter {}".format(param))
-
-    @staticmethod
-    def dict_from_file(path, key='id', dialect='excel-tab'):
-        """
-        Build a dictionary from an object array in a file
-        :param path: local path to object
-        :param key: what field should be used as the key
-        :param dialect: excel-tab for TSV or excel for CSV
-        :return:
-        """
-        if not os.path.exists(path):
-            raise ValueError("File not found: {}".format(path))
-        reader = csv.DictReader(open(path), dialect=dialect)
-        return dict([(x[key], x) for x in reader])
-
-    @staticmethod
-    def alias_dict_from_file(path, dialect='excel-tab'):
-        """
-        Build a dictionary from an object array in a file
-        :param path: local path to object
-        :param dialect: excel-tab for TSV or excel for CSV
-        :return:
-        """
-        alias_mappings = defaultdict(list)
-        with open(path) as infile:
-            r = csv.DictReader(infile, dialect=dialect)
-            for line in r:
-                for seed_id in line['MS ID'].split('|'):
-                    if line['Source'] == 'Enzyme Class':
-                        alias_mappings[seed_id].append(line['External ID'])
-                    else:
-                        alias_mappings[seed_id].append('%s:%s' % (
-                            line['Source'].strip(), line['External ID']))
-        return alias_mappings
 
     #END_CLASS_HEADER
 
@@ -84,19 +34,19 @@ class BiochemistryAPI:
         self.config = config
         self.scratch = config['scratch']
         data_dir = '/kb/module/data/'
-        self.compounds = self.dict_from_file(data_dir + "compounds.tsv")
-        self.reactions = self.dict_from_file(data_dir + "reactions.tsv")
-        self.comp_aliases = self.alias_dict_from_file(data_dir +
+        self.compounds = utils.dict_from_file(data_dir + "compounds.tsv")
+        self.structures = utils.make_mol_tuples(self.compounds.values())
+        self.reactions = utils.dict_from_file(data_dir + "reactions.tsv")
+        self.comp_aliases = utils.alias_dict_from_file(data_dir +
                                                       "Compounds_Aliases.tsv")
-        self.rxn_aliases = self.alias_dict_from_file(data_dir +
+        self.rxn_aliases = utils.alias_dict_from_file(data_dir +
                                                       "Reactions_Aliases.tsv")
-        self.ec_classes = self.alias_dict_from_file(data_dir + 'Enzyme_Class_Reactions_Aliases.tsv')
+        self.ec_classes = utils.alias_dict_from_file(data_dir + 'Enzyme_Class_Reactions_Aliases.tsv')
 
         print("Loaded {} compounds and {} reactions".format(
             len(self.compounds), len(self.reactions)))
         #END_CONSTRUCTOR
         pass
-
 
     def get_reactions(self, ctx, params):
         """
@@ -127,7 +77,7 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: out_reactions
         #BEGIN get_reactions
-        self._check_param(params, ['reactions'])
+        utils.check_param(params, ['reactions'])
         out_reactions = []
         for x in params['reactions']:
             id = x.split('/')[-1]
@@ -171,7 +121,7 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: out_compounds
         #BEGIN get_compounds
-        self._check_param(params, ['compounds'])
+        utils.check_param(params, ['compounds'])
         out_compounds = []
         for x in params['compounds']:
             id = x.split('/')[-1]
@@ -188,6 +138,54 @@ class BiochemistryAPI:
         # return the results
         return [out_compounds]
 
+    def substructure_search(self, ctx, params):
+        """
+        Returns compound ids for compounds that contain the query substructure
+        :param params: instance of type "substructure_search_params" ->
+           structure: parameter "query" of String
+        :returns: instance of list of type "compound_id" (An identifier for
+           compounds in the KBase biochemistry database. e.g. cpd00001)
+        """
+        # ctx is the context object
+        # return variables are: matching_ids
+        #BEGIN substructure_search
+        utils.check_param(params, ['query'])
+        matching_ids = utils.substructure_search(params['query'], self.structures)
+        #END substructure_search
+
+        # At some point might do deeper type checking...
+        if not isinstance(matching_ids, list):
+            raise ValueError('Method substructure_search return value ' +
+                             'matching_ids is not type list as required.')
+        # return the results
+        return [matching_ids]
+
+    def similarity_search(self, ctx, params):
+        """
+        Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+        :param params: instance of type "similarity_search_params" (string
+           query: Either InChI or SMILES string string fp_type: Either MACCS
+           or Morgan fingerprints float min_similarity: In range 0-1) ->
+           structure: parameter "query" of String, parameter "fp_type" of
+           String, parameter "min_similarity" of Double
+        :returns: instance of list of type "compound_id" (An identifier for
+           compounds in the KBase biochemistry database. e.g. cpd00001)
+        """
+        # ctx is the context object
+        # return variables are: matching_ids
+        #BEGIN similarity_search
+        utils.check_param(params, ['query'], ['fp_type', 'min_similarity'])
+        params['structures'] = self.structures
+        matching_ids = utils.similarity_search(**params)
+        #END similarity_search
+
+        # At some point might do deeper type checking...
+        if not isinstance(matching_ids, list):
+            raise ValueError('Method similarity_search return value ' +
+                             'matching_ids is not type list as required.')
+        # return the results
+        return [matching_ids]
+
     def depict_compounds(self, ctx, params):
         """
         Returns a list of depictions for the compound_structures in SVG format
@@ -198,9 +196,8 @@ class BiochemistryAPI:
         # ctx is the context object
         # return variables are: depictions
         #BEGIN depict_compounds
-        self._check_param(params, ['structures'])
-        depictions = [depict_compound(struct)
-                      for struct in params['structures']]
+        utils.check_param(params, ['structures'])
+        depictions = [utils.depict_compound(struct) for struct in params['structures']]
         #END depict_compounds
 
         # At some point might do deeper type checking...
