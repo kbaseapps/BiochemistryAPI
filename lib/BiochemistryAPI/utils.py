@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 from collections import defaultdict, namedtuple, OrderedDict
 
@@ -7,9 +8,9 @@ from rdkit.Chem import AllChem
 from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.DataStructs import FingerprintSimilarity
 
-lg = RDLogger.logger()
-lg.setLevel(RDLogger.CRITICAL)
-# TODO: add logging
+rdk_lg = RDLogger.logger()
+rdk_lg.setLevel(RDLogger.CRITICAL)
+log = logging.getLogger('BiochemistryAPILog')
 
 
 def check_param(in_params, req_param, opt_param=list()):
@@ -22,7 +23,7 @@ def check_param(in_params, req_param, opt_param=list()):
     defined_param = set(req_param + opt_param)
     for param in in_params:
         if param not in defined_param:
-            print("WARNING: received unexpected parameter {}".format(param))
+            log.warning("WARNING: received unexpected parameter {}".format(param))
 
 
 def dict_from_file(path, key='id', dialect='excel-tab'):
