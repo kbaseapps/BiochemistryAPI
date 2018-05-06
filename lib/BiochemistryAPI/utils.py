@@ -12,6 +12,7 @@ rdk_lg = RDLogger.logger()
 rdk_lg.setLevel(RDLogger.CRITICAL)
 logging.basicConfig(level=logging.INFO)
 
+
 def check_param(in_params, req_param, opt_param=list()):
     """
     Check if each of the params in the list are in the input params
@@ -59,17 +60,28 @@ def alias_dict_from_file(path, dialect='excel-tab'):
     return alias_mappings
 
 
+def _get_mol(structure):
+    if "InChI" in structure:
+        mol = AllChem.MolFromInchi(structure)
+    else:
+        mol = AllChem.MolFromSmiles(structure)
+    return mol
+
+
 def make_mol_tuples(compound_dict, id_key="id", struct_key='structure', struct_type='inchi'):
     """
     Creates named tuples with (compound_id, RDKit Mol Object) from a dict with SMILES or InChI
     """
-    MolTuple = namedtuple("MolTuple", ("id", "mol"))
-    if struct_type.lower() == 'inchi':
-        return [MolTuple(comp[id_key], AllChem.MolFromInchi(comp[struct_key]))
-                for comp in compound_dict]
-    if struct_type.lower() == 'smiles':
-        return [MolTuple(comp[id_key], AllChem.MolFromSmiles(comp[struct_key]))
-                for comp in compound_dict]
+    MolTuple = namedtuple("MolTuple", "id mol maccs_fp rdkit_fp")
+    tups = []
+    for comp in compound_dict:
+        mol = _get_mol(comp[struct_key])
+        if mol:
+            tups.append(MolTuple(comp[id_key],
+                                 mol,
+                                 AllChem.GetMACCSKeysFingerprint(mol),
+                                 AllChem.RDKFingerprint(mol)))
+    return tups
 
 
 def substructure_search(query, structures):
@@ -86,13 +98,11 @@ def similarity_search(query, structures, fp_type='maccs', min_similarity=0.8):
     if fp_type.lower() == 'maccs':
         fp1 = AllChem.GetMACCSKeysFingerprint(_get_mol(query))
         return [x.id for x in structures
-                if x.mol and FingerprintSimilarity(fp1, AllChem.GetMACCSKeysFingerprint(x.mol))
-                >= min_similarity]
+                if FingerprintSimilarity(fp1, x.maccs_fp) >= min_similarity]
     elif fp_type.lower() == 'rdkit':
         fp1 = AllChem.RDKFingerprint(_get_mol(query))
         return [x.id for x in structures
-                if x.mol and FingerprintSimilarity(fp1, AllChem.RDKFingerprint(x.mol))
-                >= min_similarity]
+                if FingerprintSimilarity(fp1, x.rdkit_fp) >= min_similarity]
     else:
         fp_types = ", ".join(('maccs', 'rdkit'))
         raise ValueError('Invalid fingerprint type: choose one of {}'.format(fp_types))
@@ -113,11 +123,3 @@ def depict_compound(structure, size=(300, 300)):
     dwr.DrawMolecule(mol)
     dwr.FinishDrawing()
     return dwr.GetDrawingText().replace('svg:', '')
-
-
-def _get_mol(structure):
-    if "InChI" in structure:
-        mol = AllChem.MolFromInchi(structure)
-    else:
-        mol = AllChem.MolFromSmiles(structure)
-    return mol
