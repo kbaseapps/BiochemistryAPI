@@ -90,6 +90,33 @@ class BiochemistryAPI(object):
             'BiochemistryAPI.get_compounds',
             [params], self._service_ver, context)
 
+    def substructure_search(self, params, context=None):
+        """
+        Returns compound ids for compounds that contain the query substructure
+        :param params: instance of type "substructure_search_params" ->
+           structure: parameter "query" of String
+        :returns: instance of list of type "compound_id" (An identifier for
+           compounds in the KBase biochemistry database. e.g. cpd00001)
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.substructure_search',
+            [params], self._service_ver, context)
+
+    def similarity_search(self, params, context=None):
+        """
+        Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+        :param params: instance of type "similarity_search_params" (string
+           query: Either InChI or SMILES string string fp_type: Either MACCS
+           or Morgan fingerprints float min_similarity: In range 0-1) ->
+           structure: parameter "query" of String, parameter "fp_type" of
+           String, parameter "min_similarity" of Double
+        :returns: instance of list of type "compound_id" (An identifier for
+           compounds in the KBase biochemistry database. e.g. cpd00001)
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.similarity_search',
+            [params], self._service_ver, context)
+
     def depict_compounds(self, params, context=None):
         """
         Returns a list of depictions for the compound_structures in SVG format

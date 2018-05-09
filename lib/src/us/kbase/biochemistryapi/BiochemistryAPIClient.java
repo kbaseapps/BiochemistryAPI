@@ -199,6 +199,42 @@ public class BiochemistryAPIClient {
     }
 
     /**
+     * <p>Original spec-file function name: substructure_search</p>
+     * <pre>
+     * Returns compound ids for compounds that contain the query substructure
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.SubstructureSearchParams SubstructureSearchParams} (original type "substructure_search_params")
+     * @return   parameter "matching_ids" of list of original type "compound_id" (An identifier for compounds in the KBase biochemistry database. e.g. cpd00001)
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public List<String> substructureSearch(SubstructureSearchParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.substructure_search", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: similarity_search</p>
+     * <pre>
+     * Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.SimilaritySearchParams SimilaritySearchParams} (original type "similarity_search_params")
+     * @return   parameter "matching_ids" of list of original type "compound_id" (An identifier for compounds in the KBase biochemistry database. e.g. cpd00001)
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public List<String> similaritySearch(SimilaritySearchParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.similarity_search", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
      * <p>Original spec-file function name: depict_compounds</p>
      * <pre>
      * Returns a list of depictions for the compound_structures in SVG format

@@ -324,6 +324,186 @@ Returns data for the requested compounds
  
 
 
+=head2 substructure_search
+
+  $matching_ids = $obj->substructure_search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a BiochemistryAPI.substructure_search_params
+$matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
+substructure_search_params is a reference to a hash where the following keys are defined:
+	query has a value which is a string
+compound_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a BiochemistryAPI.substructure_search_params
+$matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
+substructure_search_params is a reference to a hash where the following keys are defined:
+	query has a value which is a string
+compound_id is a string
+
+
+=end text
+
+=item Description
+
+Returns compound ids for compounds that contain the query substructure
+
+=back
+
+=cut
+
+ sub substructure_search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function substructure_search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to substructure_search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'substructure_search');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "BiochemistryAPI.substructure_search",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'substructure_search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method substructure_search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'substructure_search',
+				       );
+    }
+}
+ 
+
+
+=head2 similarity_search
+
+  $matching_ids = $obj->similarity_search($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a BiochemistryAPI.similarity_search_params
+$matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
+similarity_search_params is a reference to a hash where the following keys are defined:
+	query has a value which is a string
+	fp_type has a value which is a string
+	min_similarity has a value which is a float
+compound_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a BiochemistryAPI.similarity_search_params
+$matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
+similarity_search_params is a reference to a hash where the following keys are defined:
+	query has a value which is a string
+	fp_type has a value which is a string
+	min_similarity has a value which is a float
+compound_id is a string
+
+
+=end text
+
+=item Description
+
+Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+
+=back
+
+=cut
+
+ sub similarity_search
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function similarity_search (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to similarity_search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'similarity_search');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "BiochemistryAPI.similarity_search",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'similarity_search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method similarity_search",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'similarity_search',
+				       );
+    }
+}
+ 
+
+
 =head2 depict_compounds
 
   $depictions = $obj->depict_compounds($params)
@@ -746,6 +926,77 @@ compounds has a value which is a reference to a list where each element is a Bio
 
 a reference to a hash where the following keys are defined:
 compounds has a value which is a reference to a list where each element is a BiochemistryAPI.compound_id
+
+
+=end text
+
+=back
+
+
+
+=head2 substructure_search_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+query has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+query has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 similarity_search_params
+
+=over 4
+
+
+
+=item Description
+
+string query: Either InChI or SMILES string
+        string fp_type: Either MACCS or Morgan fingerprints
+        float min_similarity: In range 0-1
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+query has a value which is a string
+fp_type has a value which is a string
+min_similarity has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+query has a value which is a string
+fp_type has a value which is a string
+min_similarity has a value which is a float
 
 
 =end text
