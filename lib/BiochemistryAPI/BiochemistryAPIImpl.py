@@ -23,9 +23,9 @@ class BiochemistryAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.1.2"
+    VERSION = "0.1.3"
     GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
-    GIT_COMMIT_HASH = "15eb8ad3e8aa95eb2f632cbfe0b96199c50e97c5"
+    GIT_COMMIT_HASH = "29caec58b8214f2f12fcbfe0d6650a720ad0ea24"
 
     #BEGIN_CLASS_HEADER
 
@@ -54,6 +54,7 @@ class BiochemistryAPI:
         #END_CONSTRUCTOR
         pass
 
+
     def get_reactions(self, ctx, params):
         """
         Returns data for the requested reactions
@@ -64,11 +65,11 @@ class BiochemistryAPI:
            "reactions" of list of type "reaction_id" (A string identifier
            used for a reaction in a KBase biochemistry.)
         :returns: instance of list of type "Reaction" (Data structures for
-           media formulation reaction_id id - ID of reaction string name -
-           primary name of reaction string abbrev - abbreviated name of
-           reaction list<string> enzymes - list of EC numbers for reaction
-           string direction - directionality of reaction string reversibility
-           - reversibility of reaction float deltaG - estimated delta G of
+           reactions reaction_id id - ID of reaction string name - primary
+           name of reaction string abbrev - abbreviated name of reaction
+           list<string> enzymes - list of EC numbers for reaction string
+           direction - directionality of reaction string reversibility -
+           reversibility of reaction float deltaG - estimated delta G of
            reaction float deltaGErr - uncertainty in estimated delta G of
            reaction string equation - reaction equation in terms of compound
            IDs string definition - reaction equation in terms of compound
@@ -113,7 +114,7 @@ class BiochemistryAPI:
            "compounds" of list of type "compound_id" (An identifier for
            compounds in the KBase biochemistry database. e.g. cpd00001)
         :returns: instance of list of type "Compound" (Data structures for
-           media formulation compound_id id - ID of compound string abbrev -
+           compounds compound_id id - ID of compound string abbrev -
            abbreviated name of compound string name - primary name of
            compound list<string> aliases - list of aliases for compound float
            charge - molecular charge of compound float deltaG - estimated
@@ -152,7 +153,8 @@ class BiochemistryAPI:
         """
         Returns compound ids for compounds that contain the query substructure
         :param params: instance of type "substructure_search_params" ->
-           structure: parameter "query" of String
+           structure: parameter "query" of type "mol_structure" (A molecule
+           structure in InChI or SMILES format)
         :returns: instance of list of type "compound_id" (An identifier for
            compounds in the KBase biochemistry database. e.g. cpd00001)
         """
@@ -175,11 +177,12 @@ class BiochemistryAPI:
     def similarity_search(self, ctx, params):
         """
         Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
-        :param params: instance of type "similarity_search_params" (string
-           query: Either InChI or SMILES string string fp_type: Either MACCS
-           or Morgan fingerprints float min_similarity: In range 0-1) ->
-           structure: parameter "query" of String, parameter "fp_type" of
-           String, parameter "min_similarity" of Double
+        :param params: instance of type "similarity_search_params"
+           (mol_structure query: Either InChI or SMILES string string
+           fp_type: Either MACCS or Morgan fingerprints float min_similarity:
+           In range 0-1) -> structure: parameter "query" of type
+           "mol_structure" (A molecule structure in InChI or SMILES format),
+           parameter "fp_type" of String, parameter "min_similarity" of Double
         :returns: instance of list of type "compound_id" (An identifier for
            compounds in the KBase biochemistry database. e.g. cpd00001)
         """
@@ -204,7 +207,8 @@ class BiochemistryAPI:
         """
         Returns a list of depictions for the compound_structures in SVG format
         :param params: instance of type "depict_compounds_params" ->
-           structure: parameter "compound_structures" of list of String
+           structure: parameter "compound_structures" of list of type
+           "mol_structure" (A molecule structure in InChI or SMILES format)
         :returns: instance of list of String
         """
         # ctx is the context object
@@ -222,6 +226,30 @@ class BiochemistryAPI:
                              'depictions is not type list as required.')
         # return the results
         return [depictions]
+
+    def calculate_3D_coords(self, ctx, params):
+        """
+        Returns molecules with 3D coordinates in MolBlock format
+        :param params: instance of type "calculate_3D_coords_params" ->
+           structure: parameter "compound_structures" of list of type
+           "mol_structure" (A molecule structure in InChI or SMILES format)
+        :returns: instance of list of String
+        """
+        # ctx is the context object
+        # return variables are: mol_blocks
+        #BEGIN calculate_3D_coords
+        logging.info("Starting calculate_3D_coords")
+        logging.info("Params: {}".format(params))
+        utils.check_param(params, ['structures'])
+        mol_blocks = [utils.get_3d_mol(struct) for struct in params['structures']]
+        #END calculate_3D_coords
+
+        # At some point might do deeper type checking...
+        if not isinstance(mol_blocks, list):
+            raise ValueError('Method calculate_3D_coords return value ' +
+                             'mol_blocks is not type list as required.')
+        # return the results
+        return [mol_blocks]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

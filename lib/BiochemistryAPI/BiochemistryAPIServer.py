@@ -340,19 +340,23 @@ class Application(object):
         self.rpc_service.add(impl_BiochemistryAPI.get_compounds,
                              name='BiochemistryAPI.get_compounds',
                              types=[dict])
-        self.method_authentication['BiochemistryAPI.get_compounds'] = 'required'  # noqa
+        self.method_authentication['BiochemistryAPI.get_compounds'] = 'none'  # noqa
         self.rpc_service.add(impl_BiochemistryAPI.substructure_search,
                              name='BiochemistryAPI.substructure_search',
                              types=[dict])
-        self.method_authentication['BiochemistryAPI.substructure_search'] = 'required'  # noqa
+        self.method_authentication['BiochemistryAPI.substructure_search'] = 'none'  # noqa
         self.rpc_service.add(impl_BiochemistryAPI.similarity_search,
                              name='BiochemistryAPI.similarity_search',
                              types=[dict])
-        self.method_authentication['BiochemistryAPI.similarity_search'] = 'required'  # noqa
+        self.method_authentication['BiochemistryAPI.similarity_search'] = 'none'  # noqa
         self.rpc_service.add(impl_BiochemistryAPI.depict_compounds,
                              name='BiochemistryAPI.depict_compounds',
                              types=[dict])
-        self.method_authentication['BiochemistryAPI.depict_compounds'] = 'required'  # noqa
+        self.method_authentication['BiochemistryAPI.depict_compounds'] = 'none'  # noqa
+        self.rpc_service.add(impl_BiochemistryAPI.calculate_3D_coords,
+                             name='BiochemistryAPI.calculate_3D_coords',
+                             types=[dict])
+        self.method_authentication['BiochemistryAPI.calculate_3D_coords'] = 'none'  # noqa
         self.rpc_service.add(impl_BiochemistryAPI.status,
                              name='BiochemistryAPI.status',
                              types=[dict])

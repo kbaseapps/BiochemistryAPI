@@ -9,7 +9,7 @@ module BiochemistryAPI {
 	/* A string identifier used for a reaction in a KBase biochemistry. */
     typedef string reaction_id;
 
-    /* Data structures for media formulation
+    /* Data structures for compounds
 
 		compound_id id - ID of compound
 		string abbrev - abbreviated name of compound
@@ -32,7 +32,7 @@ module BiochemistryAPI {
 		string formula;
     } Compound;
 
-    /* Data structures for media formulation
+    /* Data structures for reactions
 
 		reaction_id id - ID of reaction
 		string name - primary name of reaction
@@ -58,6 +58,13 @@ module BiochemistryAPI {
 		string equation;
 		string definition;
     } Reaction;
+
+    /*
+        A molecule structure in InChI or SMILES format
+    */
+
+    typedef string mol_structure;
+
     /*
         This module serves biochemistry content
     */
@@ -84,40 +91,46 @@ module BiochemistryAPI {
     /*
     	Returns data for the requested compounds
     */
-    funcdef get_compounds(get_compounds_params params) returns (list<Compound> out_compounds) authentication required;
+    funcdef get_compounds(get_compounds_params params) returns (list<Compound> out_compounds);
 
     typedef structure {
-		string query;
+		mol_structure query;
     } substructure_search_params;
     /*
     	Returns compound ids for compounds that contain the query substructure
     */
-    funcdef substructure_search(substructure_search_params params) returns (list<compound_id> matching_ids) authentication required;
+    funcdef substructure_search(substructure_search_params params) returns (list<compound_id> matching_ids);
 
     /*
-        string query: Either InChI or SMILES string
+        mol_structure query: Either InChI or SMILES string
 		string fp_type: Either MACCS or Morgan fingerprints
 		float min_similarity: In range 0-1
     */
 
     typedef structure {
-		string query;
+		mol_structure query;
 		string fp_type;
 		float min_similarity;
     } similarity_search_params;
     /*
     	Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
     */
-    funcdef similarity_search(similarity_search_params params) returns (list<compound_id> matching_ids) authentication required;
+    funcdef similarity_search(similarity_search_params params) returns (list<compound_id> matching_ids);
 
 
     typedef structure {
-		list<string> compound_structures;
+		list<mol_structure> compound_structures;
     } depict_compounds_params;
     /*
     	Returns a list of depictions for the compound_structures in SVG format
     */
-    funcdef depict_compounds(depict_compounds_params params) returns (list<string> depictions) authentication required;
+    funcdef depict_compounds(depict_compounds_params params) returns (list<string> depictions);
 
-
+    typedef structure {
+		list<mol_structure> compound_structures;
+    } calculate_3D_coords_params;
+    /*
+    	Returns molecules with 3D coordinates in MolBlock format
+    */
+    funcdef calculate_3D_coords(calculate_3D_coords_params params) returns (list<string> mol_blocks);
 };

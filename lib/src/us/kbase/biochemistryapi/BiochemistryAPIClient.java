@@ -194,7 +194,7 @@ public class BiochemistryAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<List<Compound>>> retType = new TypeReference<List<List<Compound>>>() {};
-        List<List<Compound>> res = caller.jsonrpcCall("BiochemistryAPI.get_compounds", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<Compound>> res = caller.jsonrpcCall("BiochemistryAPI.get_compounds", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -212,7 +212,7 @@ public class BiochemistryAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.substructure_search", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.substructure_search", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -230,7 +230,7 @@ public class BiochemistryAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.similarity_search", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.similarity_search", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -248,7 +248,25 @@ public class BiochemistryAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.depict_compounds", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.depict_compounds", args, retType, true, false, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: calculate_3D_coords</p>
+     * <pre>
+     * Returns molecules with 3D coordinates in MolBlock format
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.Calculate3DCoordsParams Calculate3DCoordsParams} (original type "calculate_3D_coords_params")
+     * @return   parameter "mol_blocks" of list of String
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public List<String> calculate3DCoords(Calculate3DCoordsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
+        List<List<String>> res = caller.jsonrpcCall("BiochemistryAPI.calculate_3D_coords", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

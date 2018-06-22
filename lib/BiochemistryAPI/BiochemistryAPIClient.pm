@@ -280,7 +280,7 @@ Returns data for the requested compounds
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -338,7 +338,8 @@ Returns data for the requested compounds
 $params is a BiochemistryAPI.substructure_search_params
 $matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
 substructure_search_params is a reference to a hash where the following keys are defined:
-	query has a value which is a string
+	query has a value which is a BiochemistryAPI.mol_structure
+mol_structure is a string
 compound_id is a string
 
 </pre>
@@ -350,7 +351,8 @@ compound_id is a string
 $params is a BiochemistryAPI.substructure_search_params
 $matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
 substructure_search_params is a reference to a hash where the following keys are defined:
-	query has a value which is a string
+	query has a value which is a BiochemistryAPI.mol_structure
+mol_structure is a string
 compound_id is a string
 
 
@@ -368,7 +370,7 @@ Returns compound ids for compounds that contain the query substructure
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -426,9 +428,10 @@ Returns compound ids for compounds that contain the query substructure
 $params is a BiochemistryAPI.similarity_search_params
 $matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
 similarity_search_params is a reference to a hash where the following keys are defined:
-	query has a value which is a string
+	query has a value which is a BiochemistryAPI.mol_structure
 	fp_type has a value which is a string
 	min_similarity has a value which is a float
+mol_structure is a string
 compound_id is a string
 
 </pre>
@@ -440,9 +443,10 @@ compound_id is a string
 $params is a BiochemistryAPI.similarity_search_params
 $matching_ids is a reference to a list where each element is a BiochemistryAPI.compound_id
 similarity_search_params is a reference to a hash where the following keys are defined:
-	query has a value which is a string
+	query has a value which is a BiochemistryAPI.mol_structure
 	fp_type has a value which is a string
 	min_similarity has a value which is a float
+mol_structure is a string
 compound_id is a string
 
 
@@ -460,7 +464,7 @@ Returns compound ids for compounds that have greater fingerprint similarity than
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -518,7 +522,8 @@ Returns compound ids for compounds that have greater fingerprint similarity than
 $params is a BiochemistryAPI.depict_compounds_params
 $depictions is a reference to a list where each element is a string
 depict_compounds_params is a reference to a hash where the following keys are defined:
-	compound_structures has a value which is a reference to a list where each element is a string
+	compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
+mol_structure is a string
 
 </pre>
 
@@ -529,7 +534,8 @@ depict_compounds_params is a reference to a hash where the following keys are de
 $params is a BiochemistryAPI.depict_compounds_params
 $depictions is a reference to a list where each element is a string
 depict_compounds_params is a reference to a hash where the following keys are defined:
-	compound_structures has a value which is a reference to a list where each element is a string
+	compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
+mol_structure is a string
 
 
 =end text
@@ -546,7 +552,7 @@ Returns a list of depictions for the compound_structures in SVG format
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -584,6 +590,94 @@ Returns a list of depictions for the compound_structures in SVG format
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method depict_compounds",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'depict_compounds',
+				       );
+    }
+}
+ 
+
+
+=head2 calculate_3D_coords
+
+  $mol_blocks = $obj->calculate_3D_coords($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a BiochemistryAPI.calculate_3D_coords_params
+$mol_blocks is a reference to a list where each element is a string
+calculate_3D_coords_params is a reference to a hash where the following keys are defined:
+	compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
+mol_structure is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a BiochemistryAPI.calculate_3D_coords_params
+$mol_blocks is a reference to a list where each element is a string
+calculate_3D_coords_params is a reference to a hash where the following keys are defined:
+	compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
+mol_structure is a string
+
+
+=end text
+
+=item Description
+
+Returns molecules with 3D coordinates in MolBlock format
+
+=back
+
+=cut
+
+ sub calculate_3D_coords
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function calculate_3D_coords (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to calculate_3D_coords:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'calculate_3D_coords');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "BiochemistryAPI.calculate_3D_coords",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'calculate_3D_coords',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method calculate_3D_coords",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'calculate_3D_coords',
 				       );
     }
 }
@@ -631,16 +725,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'depict_compounds',
+                method_name => 'calculate_3D_coords',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method depict_compounds",
+            error => "Error invoking method calculate_3D_coords",
             status_line => $self->{client}->status_line,
-            method_name => 'depict_compounds',
+            method_name => 'calculate_3D_coords',
         );
     }
 }
@@ -747,7 +841,7 @@ a string
 
 =item Description
 
-Data structures for media formulation
+Data structures for compounds
 
                 compound_id id - ID of compound
                 string abbrev - abbreviated name of compound
@@ -805,7 +899,7 @@ formula has a value which is a string
 
 =item Description
 
-Data structures for media formulation
+Data structures for reactions
 
                 reaction_id id - ID of reaction
                 string name - primary name of reaction
@@ -854,6 +948,37 @@ deltaGErr has a value which is a float
 equation has a value which is a string
 definition has a value which is a string
 
+
+=end text
+
+=back
+
+
+
+=head2 mol_structure
+
+=over 4
+
+
+
+=item Description
+
+A molecule structure in InChI or SMILES format
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
 
 =end text
 
@@ -946,7 +1071,7 @@ compounds has a value which is a reference to a list where each element is a Bio
 
 <pre>
 a reference to a hash where the following keys are defined:
-query has a value which is a string
+query has a value which is a BiochemistryAPI.mol_structure
 
 </pre>
 
@@ -955,7 +1080,7 @@ query has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-query has a value which is a string
+query has a value which is a BiochemistryAPI.mol_structure
 
 
 =end text
@@ -972,7 +1097,7 @@ query has a value which is a string
 
 =item Description
 
-string query: Either InChI or SMILES string
+mol_structure query: Either InChI or SMILES string
         string fp_type: Either MACCS or Morgan fingerprints
         float min_similarity: In range 0-1
 
@@ -983,7 +1108,7 @@ string query: Either InChI or SMILES string
 
 <pre>
 a reference to a hash where the following keys are defined:
-query has a value which is a string
+query has a value which is a BiochemistryAPI.mol_structure
 fp_type has a value which is a string
 min_similarity has a value which is a float
 
@@ -994,7 +1119,7 @@ min_similarity has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-query has a value which is a string
+query has a value which is a BiochemistryAPI.mol_structure
 fp_type has a value which is a string
 min_similarity has a value which is a float
 
@@ -1017,7 +1142,7 @@ min_similarity has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-compound_structures has a value which is a reference to a list where each element is a string
+compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
 
 </pre>
 
@@ -1026,7 +1151,37 @@ compound_structures has a value which is a reference to a list where each elemen
 =begin text
 
 a reference to a hash where the following keys are defined:
-compound_structures has a value which is a reference to a list where each element is a string
+compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
+
+
+=end text
+
+=back
+
+
+
+=head2 calculate_3D_coords_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+compound_structures has a value which is a reference to a list where each element is a BiochemistryAPI.mol_structure
 
 
 =end text

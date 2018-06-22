@@ -123,3 +123,13 @@ def depict_compound(structure, size=(300, 300)):
     dwr.DrawMolecule(mol)
     dwr.FinishDrawing()
     return dwr.GetDrawingText().replace('svg:', '')
+
+
+def get_3d_mol(structure):
+    mol = _get_mol(structure)
+    if not mol:
+        return ""
+    AllChem.AddHs(mol)
+    AllChem.EmbedMolecule(mol, AllChem.ETKDG())
+    AllChem.RemoveHs(mol)
+    return AllChem.MolToMolBlock(mol)
