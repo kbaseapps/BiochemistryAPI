@@ -90,6 +90,31 @@ class BiochemistryAPI(object):
             'BiochemistryAPI.get_compounds',
             [params], self._service_ver, context)
 
+    def search_compounds(self, params, context=None):
+        """
+        Returns compounds which match a string
+        :param params: instance of type "search_compounds_params" (Input
+           parameters for the "search_compounds" function. string query - a
+           query string to match against names & aliases) -> structure:
+           parameter "query" of String
+        :returns: instance of list of type "Compound" (Data structures for
+           compounds compound_id id - ID of compound string abbrev -
+           abbreviated name of compound string name - primary name of
+           compound list<string> aliases - list of aliases for compound float
+           charge - molecular charge of compound float deltaG - estimated
+           compound delta G float deltaGErr - uncertainty in estimated
+           compound delta G string formula - molecular formula of compound)
+           -> structure: parameter "id" of type "compound_id" (An identifier
+           for compounds in the KBase biochemistry database. e.g. cpd00001),
+           parameter "abbrev" of String, parameter "name" of String,
+           parameter "aliases" of list of String, parameter "charge" of
+           Double, parameter "deltaG" of Double, parameter "deltaGErr" of
+           Double, parameter "formula" of String
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.search_compounds',
+            [params], self._service_ver, context)
+
     def substructure_search(self, params, context=None):
         """
         Returns compound ids for compounds that contain the query substructure

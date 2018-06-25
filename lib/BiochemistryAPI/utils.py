@@ -1,6 +1,7 @@
 import csv
 import logging
 import os
+import re
 from collections import defaultdict, namedtuple, OrderedDict
 
 from rdkit import RDLogger
@@ -37,7 +38,18 @@ def dict_from_file(path, key='id', dialect='excel-tab'):
     if not os.path.exists(path):
         raise ValueError("File not found: {}".format(path))
     reader = csv.DictReader(open(path), dialect=dialect)
-    return OrderedDict([(x[key], x) for x in reader])
+    id_dict = OrderedDict()
+    alias_dict = defaultdict(set)
+    for line in reader:
+        id_dict[line['id']] = line
+        if line.get('name'):
+            alias_dict[line['name'].lower().translate(None, "_- ")].add(line['id'])
+        if line.get('abbreviation'):
+            alias_dict[line['name'].lower().translate(None, "_- ")].add(line['id'])
+        if line.get('aliases'):
+            for match in re.findall('"\S+?:(\S+?)"', line['aliases']):
+                alias_dict[match.lower().translate(None, "_- ")].add(line['id'])
+    return id_dict, alias_dict
 
 
 def alias_dict_from_file(path, dialect='excel-tab'):

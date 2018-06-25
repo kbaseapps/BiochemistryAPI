@@ -199,6 +199,24 @@ public class BiochemistryAPIClient {
     }
 
     /**
+     * <p>Original spec-file function name: search_compounds</p>
+     * <pre>
+     * Returns compounds which match a string
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.biochemistryapi.SearchCompoundsParams SearchCompoundsParams} (original type "search_compounds_params")
+     * @return   parameter "out_compounds" of list of type {@link us.kbase.biochemistryapi.Compound Compound}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public List<Compound> searchCompounds(SearchCompoundsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<List<Compound>>> retType = new TypeReference<List<List<Compound>>>() {};
+        List<List<Compound>> res = caller.jsonrpcCall("BiochemistryAPI.search_compounds", args, retType, true, false, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
      * <p>Original spec-file function name: substructure_search</p>
      * <pre>
      * Returns compound ids for compounds that contain the query substructure

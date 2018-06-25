@@ -25,7 +25,7 @@ class BiochemistryAPI:
     ######################################### noqa
     VERSION = "0.1.3"
     GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
-    GIT_COMMIT_HASH = "29caec58b8214f2f12fcbfe0d6650a720ad0ea24"
+    GIT_COMMIT_HASH = "7dcfe665800b5782e149722390efcc8f5787e196"
 
     #BEGIN_CLASS_HEADER
 
@@ -38,9 +38,9 @@ class BiochemistryAPI:
         self.config = config
         self.scratch = config['scratch']
         data_dir = '/kb/module/data/'
-        self.compounds = utils.dict_from_file(data_dir + "compounds.tsv")
+        self.compounds, self.comp_search_dict = utils.dict_from_file(data_dir + "compounds.tsv")
 
-        self.reactions = utils.dict_from_file(data_dir + "reactions.tsv")
+        self.reactions, self.rxn_search_dict = utils.dict_from_file(data_dir + "reactions.tsv")
         self.comp_aliases = utils.alias_dict_from_file(data_dir +
                                                       "Compounds_Aliases.tsv")
         self.rxn_aliases = utils.alias_dict_from_file(data_dir +
@@ -145,6 +145,44 @@ class BiochemistryAPI:
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
             raise ValueError('Method get_compounds return value ' +
+                             'out_compounds is not type list as required.')
+        # return the results
+        return [out_compounds]
+
+    def search_compounds(self, ctx, params):
+        """
+        Returns compounds which match a string
+        :param params: instance of type "search_compounds_params" (Input
+           parameters for the "search_compounds" function. string query - a
+           query string to match against names & aliases) -> structure:
+           parameter "query" of String
+        :returns: instance of list of type "Compound" (Data structures for
+           compounds compound_id id - ID of compound string abbrev -
+           abbreviated name of compound string name - primary name of
+           compound list<string> aliases - list of aliases for compound float
+           charge - molecular charge of compound float deltaG - estimated
+           compound delta G float deltaGErr - uncertainty in estimated
+           compound delta G string formula - molecular formula of compound)
+           -> structure: parameter "id" of type "compound_id" (An identifier
+           for compounds in the KBase biochemistry database. e.g. cpd00001),
+           parameter "abbrev" of String, parameter "name" of String,
+           parameter "aliases" of list of String, parameter "charge" of
+           Double, parameter "deltaG" of Double, parameter "deltaGErr" of
+           Double, parameter "formula" of String
+        """
+        # ctx is the context object
+        # return variables are: out_compounds
+        #BEGIN search_compounds
+        logging.info("Starting search_compounds")
+        logging.info("Params: {}".format(params))
+        utils.check_param(params, ['query'])
+        normed_query = params['query'].lower().translate(None, "_- ")
+        out_compounds = [self.compounds[cid] for cid in self.comp_search_dict.get(normed_query, [])]
+        #END search_compounds
+
+        # At some point might do deeper type checking...
+        if not isinstance(out_compounds, list):
+            raise ValueError('Method search_compounds return value ' +
                              'out_compounds is not type list as required.')
         # return the results
         return [out_compounds]

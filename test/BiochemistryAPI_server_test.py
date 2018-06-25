@@ -118,6 +118,17 @@ class BiochemistryAPITest(unittest.TestCase):
         if missing_col:
             raise AssertionError("Missing Columns:", missing_col)
 
+    def test_search_compounds(self):
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'O2'})[0]
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0]['id'], 'cpd00007')
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'OXYGEN-MOLECULE'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'cpd00007')
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'S - adenosyl -L-methionine'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'cpd00017')
+
     def test_substructure_search(self):
         ids = self.getImpl().substructure_search(self.ctx, {'query': 'C(=O)O'})[0]
         self.assertEqual(len(ids), 7262)
