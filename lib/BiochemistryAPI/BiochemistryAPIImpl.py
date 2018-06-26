@@ -176,7 +176,7 @@ class BiochemistryAPI:
         logging.info("Starting search_compounds")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ['query'])
-        normed_query = params['query'].lower().translate(None, "_- ")
+        normed_query = params['query'].lower().translate(utils.ttable)
         out_compounds = [self.compounds[cid] for cid in self.comp_search_dict.get(normed_query, [])]
         #END search_compounds
 

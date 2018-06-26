@@ -5,7 +5,10 @@
 This module serves Biochemistry data for KBase
 
 ## Release Notes
-#### 0.1.4 (06/26/18)
+#### 0.2.0 (06/26/18)
+- convert to Python3 module
+
+#### 0.1.4 (06/25/18)
 - Add basic compound search methods
 - Add 3D compound generation method
 

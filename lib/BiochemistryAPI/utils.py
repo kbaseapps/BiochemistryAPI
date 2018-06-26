@@ -12,6 +12,7 @@ from rdkit.DataStructs import FingerprintSimilarity
 rdk_lg = RDLogger.logger()
 rdk_lg.setLevel(RDLogger.CRITICAL)
 logging.basicConfig(level=logging.INFO)
+ttable = str.maketrans("", "", "_- ")
 
 
 def check_param(in_params, req_param, opt_param=list()):
@@ -43,12 +44,12 @@ def dict_from_file(path, key='id', dialect='excel-tab'):
     for line in reader:
         id_dict[line['id']] = line
         if line.get('name'):
-            alias_dict[line['name'].lower().translate(None, "_- ")].add(line['id'])
+            alias_dict[line['name'].lower().translate(ttable)].add(line['id'])
         if line.get('abbreviation'):
-            alias_dict[line['name'].lower().translate(None, "_- ")].add(line['id'])
+            alias_dict[line['name'].lower().translate(ttable)].add(line['id'])
         if line.get('aliases'):
             for match in re.findall('"\S+?:(\S+?)"', line['aliases']):
-                alias_dict[match.lower().translate(None, "_- ")].add(line['id'])
+                alias_dict[match.lower().translate(ttable)].add(line['id'])
     return id_dict, alias_dict
 
 
