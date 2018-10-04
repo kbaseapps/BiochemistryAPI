@@ -100,7 +100,7 @@ class BiochemistryAPITest(unittest.TestCase):
                                       'KEGG:C00011', 'MetaCyc:CARBON-DIOXIDE',
                                       'PlantCyc:CARBON-DIOXIDE', 'BiGG:co2']
         missing_col = {'name', 'formula', 'charge', 'deltaG', 'deltaGErr',
-                       'abbrev', 'aliases'} - set(cpds[0].keys())
+                       'abbreviation', 'aliases'} - set(cpds[0].keys())
         if missing_col:
             raise AssertionError("Missing Columns:", missing_col)
 
@@ -119,15 +119,37 @@ class BiochemistryAPITest(unittest.TestCase):
             raise AssertionError("Missing Columns:", missing_col)
 
     def test_search_compounds(self):
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'cpd00007'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'cpd00007')
         res = self.getImpl().search_compounds(self.ctx, {'query': 'O2'})[0]
-        self.assertEqual(len(res), 2)
+        self.assertEqual(len(res), 3)
         self.assertEqual(res[0]['id'], 'cpd00007')
         res = self.getImpl().search_compounds(self.ctx, {'query': 'OXYGEN-MOLECULE'})[0]
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['id'], 'cpd00007')
-        res = self.getImpl().search_compounds(self.ctx, {'query': 'S - adenosyl -L-methionine'})[0]
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'Pyruvate',
+                                                         'limit': 5})[0]
+        self.assertEqual(len(res), 5)
+        self.assertEqual(res[0]['id'], 'cpd00020')
+
+    def test_search_reactions(self):
+        res = self.getImpl().search_reactions(self.ctx, {'query': 'rxn00001'})[0]
         self.assertEqual(len(res), 1)
-        self.assertEqual(res[0]['id'], 'cpd00017')
+        self.assertEqual(res[0]['id'], 'rxn00001')
+        res = self.getImpl().search_reactions(self.ctx, {'query': 'R00004'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'rxn00001')
+        res = self.getImpl().search_reactions(self.ctx, {'query': 'diphosphate phosphohydrolase'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'rxn00001')
+        res = self.getImpl().search_reactions(self.ctx, {'query': 'phosphohydrolase'})[0]
+        self.assertEqual(len(res), 10)
+        self.assertEqual(res[0]['id'], 'rxn00001')
+        res = self.getImpl().search_reactions(self.ctx, {'query': 'phosphohydrolase',
+                                                         'limit': 500})[0]
+        self.assertEqual(len(res), 385)
+        self.assertEqual(res[0]['id'], 'rxn00001')
 
     def test_substructure_search(self):
         ids = self.getImpl().substructure_search(self.ctx, {'query': 'C(=O)O'})[0]

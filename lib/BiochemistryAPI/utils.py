@@ -4,6 +4,7 @@ import os
 import re
 from collections import defaultdict, namedtuple, OrderedDict
 
+from boltons.setutils import IndexedSet
 from rdkit import RDLogger
 from rdkit.Chem import AllChem
 from rdkit.Chem.Draw import rdMolDraw2D
@@ -12,8 +13,7 @@ from rdkit.DataStructs import FingerprintSimilarity
 rdk_lg = RDLogger.logger()
 rdk_lg.setLevel(RDLogger.CRITICAL)
 logging.basicConfig(level=logging.INFO)
-ttable = str.maketrans("", "", "_- ")
-
+ttable = str.maketrans("_-;", "   ", "()[]")
 
 def check_param(in_params, req_param, opt_param=list()):
     """
@@ -28,6 +28,13 @@ def check_param(in_params, req_param, opt_param=list()):
             logging.warning("Received unexpected parameter {}".format(param))
 
 
+def _tokenize_string(raw_string):
+    if not raw_string:
+        return []
+    normed_str = raw_string.strip().lower().translate(ttable)
+    return normed_str.split() + [normed_str]
+
+
 def dict_from_file(path, key='id', dialect='excel-tab'):
     """
     Build a dictionary from an object array in a file
@@ -40,16 +47,21 @@ def dict_from_file(path, key='id', dialect='excel-tab'):
         raise ValueError("File not found: {}".format(path))
     reader = csv.DictReader(open(path), dialect=dialect)
     id_dict = OrderedDict()
-    alias_dict = defaultdict(set)
+    alias_dict = defaultdict(IndexedSet)
     for line in reader:
-        id_dict[line['id']] = line
-        if line.get('name'):
-            alias_dict[line['name'].lower().translate(ttable)].add(line['id'])
-        if line.get('abbreviation'):
-            alias_dict[line['name'].lower().translate(ttable)].add(line['id'])
+        id_dict[line[key]] = line
+        for tok in _tokenize_string(line[key]):
+            alias_dict[tok].add(line[key])
+        for tok in _tokenize_string(line.get('name')):
+            alias_dict[tok].add(line[key])
+        for tok in _tokenize_string(line.get('abbreviation')):
+            alias_dict[tok].add(line[key])
+        for tok in _tokenize_string(line.get('ec_number')):
+            alias_dict[tok].add(line[key])
         if line.get('aliases'):
             for match in re.findall('"\S+?:(\S+?)"', line['aliases']):
-                alias_dict[match.lower().translate(ttable)].add(line['id'])
+                for tok in _tokenize_string(match):
+                    alias_dict[tok].add(line[key])
     return id_dict, alias_dict
 
 
