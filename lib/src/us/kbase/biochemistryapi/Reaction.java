@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: Reaction</p>
  * <pre>
- * Data structures for media formulation
+ * Data structures for reactions
  *                 reaction_id id - ID of reaction
  *                 string name - primary name of reaction
  *                 string abbrev - abbreviated name of reaction

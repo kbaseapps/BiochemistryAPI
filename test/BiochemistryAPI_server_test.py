@@ -1,37 +1,13 @@
 # -*- coding: utf-8 -*-
-import unittest
-import os  # noqa: F401
-import json  # noqa: F401
-import time
-import requests
 
-from os import environ
 try:
     from ConfigParser import ConfigParser  # py2
 except:
     from configparser import ConfigParser  # py3
 
-from pprint import pprint  # noqa: F401
-
-from biokbase.workspace.client import Workspace as workspaceService
-from BiochemistryAPI.BiochemistryAPIImpl import BiochemistryAPI
-from BiochemistryAPI.BiochemistryAPIServer import MethodContext
-from BiochemistryAPI.authclient import KBaseAuth as _KBaseAuth
-
-
-import unittest
-import os  # noqa: F401
-import json  # noqa: F401
+import os
 import time
-import requests
-
-from os import environ
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
-
-from pprint import pprint  # noqa: F401
+import unittest
 
 from biokbase.workspace.client import Workspace as workspaceService
 from BiochemistryAPI.BiochemistryAPIImpl import BiochemistryAPI
@@ -43,8 +19,8 @@ class BiochemistryAPITest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = environ.get('KB_AUTH_TOKEN', None)
-        config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
+        token = os.environ.get('KB_AUTH_TOKEN', None)
+        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
         config.read(config_file)
@@ -142,6 +118,17 @@ class BiochemistryAPITest(unittest.TestCase):
         if missing_col:
             raise AssertionError("Missing Columns:", missing_col)
 
+    def test_search_compounds(self):
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'O2'})[0]
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0]['id'], 'cpd00007')
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'OXYGEN-MOLECULE'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'cpd00007')
+        res = self.getImpl().search_compounds(self.ctx, {'query': 'S - adenosyl -L-methionine'})[0]
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 'cpd00017')
+
     def test_substructure_search(self):
         ids = self.getImpl().substructure_search(self.ctx, {'query': 'C(=O)O'})[0]
         self.assertEqual(len(ids), 7262)
@@ -160,6 +147,16 @@ class BiochemistryAPITest(unittest.TestCase):
 
     def test_depict_compounds(self):
         svgs = self.getImpl().depict_compounds(
-            self.ctx, {'structures': ['C(=O)O', 'InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)']})[0]
-        assert len(svgs) == 2
-        assert '<svg' in svgs[0]
+            self.ctx, {'structures': ['C(=O)O', 'InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)', 'foo']})[0]
+        self.assertEqual(len(svgs), 3)
+        self.assertIn('<svg', svgs[0])
+        self.assertIn('<svg', svgs[1])
+        self.assertEqual(svgs[2], '')
+
+    def test_calculate_3D_coords(self):
+        mols = self.getImpl().calculate_3D_coords(
+            self.ctx, {'structures': ['C(=O)O', 'InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)', 'foo']})[0]
+        self.assertEqual(len(mols), 3)
+        self.assertIn('  -1.1054   -0.2402   -0.0000 O', mols[0])
+        self.assertIn('  -0.3889    1.2404    0.0153 O', mols[1])
+        self.assertEqual(mols[2], '')

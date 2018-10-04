@@ -23,7 +23,7 @@ class BiochemistryAPI(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -43,11 +43,11 @@ class BiochemistryAPI(object):
            "reactions" of list of type "reaction_id" (A string identifier
            used for a reaction in a KBase biochemistry.)
         :returns: instance of list of type "Reaction" (Data structures for
-           media formulation reaction_id id - ID of reaction string name -
-           primary name of reaction string abbrev - abbreviated name of
-           reaction list<string> enzymes - list of EC numbers for reaction
-           string direction - directionality of reaction string reversibility
-           - reversibility of reaction float deltaG - estimated delta G of
+           reactions reaction_id id - ID of reaction string name - primary
+           name of reaction string abbrev - abbreviated name of reaction
+           list<string> enzymes - list of EC numbers for reaction string
+           direction - directionality of reaction string reversibility -
+           reversibility of reaction float deltaG - estimated delta G of
            reaction float deltaGErr - uncertainty in estimated delta G of
            reaction string equation - reaction equation in terms of compound
            IDs string definition - reaction equation in terms of compound
@@ -73,7 +73,7 @@ class BiochemistryAPI(object):
            "compounds" of list of type "compound_id" (An identifier for
            compounds in the KBase biochemistry database. e.g. cpd00001)
         :returns: instance of list of type "Compound" (Data structures for
-           media formulation compound_id id - ID of compound string abbrev -
+           compounds compound_id id - ID of compound string abbrev -
            abbreviated name of compound string name - primary name of
            compound list<string> aliases - list of aliases for compound float
            charge - molecular charge of compound float deltaG - estimated
@@ -90,11 +90,37 @@ class BiochemistryAPI(object):
             'BiochemistryAPI.get_compounds',
             [params], self._service_ver, context)
 
+    def search_compounds(self, params, context=None):
+        """
+        Returns compounds which match a string
+        :param params: instance of type "search_compounds_params" (Input
+           parameters for the "search_compounds" function. string query - a
+           query string to match against names & aliases) -> structure:
+           parameter "query" of String
+        :returns: instance of list of type "Compound" (Data structures for
+           compounds compound_id id - ID of compound string abbrev -
+           abbreviated name of compound string name - primary name of
+           compound list<string> aliases - list of aliases for compound float
+           charge - molecular charge of compound float deltaG - estimated
+           compound delta G float deltaGErr - uncertainty in estimated
+           compound delta G string formula - molecular formula of compound)
+           -> structure: parameter "id" of type "compound_id" (An identifier
+           for compounds in the KBase biochemistry database. e.g. cpd00001),
+           parameter "abbrev" of String, parameter "name" of String,
+           parameter "aliases" of list of String, parameter "charge" of
+           Double, parameter "deltaG" of Double, parameter "deltaGErr" of
+           Double, parameter "formula" of String
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.search_compounds',
+            [params], self._service_ver, context)
+
     def substructure_search(self, params, context=None):
         """
         Returns compound ids for compounds that contain the query substructure
         :param params: instance of type "substructure_search_params" ->
-           structure: parameter "query" of String
+           structure: parameter "query" of type "mol_structure" (A molecule
+           structure in InChI or SMILES format)
         :returns: instance of list of type "compound_id" (An identifier for
            compounds in the KBase biochemistry database. e.g. cpd00001)
         """
@@ -105,11 +131,12 @@ class BiochemistryAPI(object):
     def similarity_search(self, params, context=None):
         """
         Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
-        :param params: instance of type "similarity_search_params" (string
-           query: Either InChI or SMILES string string fp_type: Either MACCS
-           or Morgan fingerprints float min_similarity: In range 0-1) ->
-           structure: parameter "query" of String, parameter "fp_type" of
-           String, parameter "min_similarity" of Double
+        :param params: instance of type "similarity_search_params"
+           (mol_structure query: Either InChI or SMILES string string
+           fp_type: Either MACCS or Morgan fingerprints float min_similarity:
+           In range 0-1) -> structure: parameter "query" of type
+           "mol_structure" (A molecule structure in InChI or SMILES format),
+           parameter "fp_type" of String, parameter "min_similarity" of Double
         :returns: instance of list of type "compound_id" (An identifier for
            compounds in the KBase biochemistry database. e.g. cpd00001)
         """
@@ -121,11 +148,24 @@ class BiochemistryAPI(object):
         """
         Returns a list of depictions for the compound_structures in SVG format
         :param params: instance of type "depict_compounds_params" ->
-           structure: parameter "compound_structures" of list of String
+           structure: parameter "compound_structures" of list of type
+           "mol_structure" (A molecule structure in InChI or SMILES format)
         :returns: instance of list of String
         """
         return self._client.call_method(
             'BiochemistryAPI.depict_compounds',
+            [params], self._service_ver, context)
+
+    def calculate_3D_coords(self, params, context=None):
+        """
+        Returns molecules with 3D coordinates in MolBlock format
+        :param params: instance of type "calculate_3D_coords_params" ->
+           structure: parameter "compound_structures" of list of type
+           "mol_structure" (A molecule structure in InChI or SMILES format)
+        :returns: instance of list of String
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.calculate_3D_coords',
             [params], self._service_ver, context)
 
     def status(self, context=None):

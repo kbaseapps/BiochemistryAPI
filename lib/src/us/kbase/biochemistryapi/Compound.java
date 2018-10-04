@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: Compound</p>
  * <pre>
- * Data structures for media formulation
+ * Data structures for compounds
  *                 compound_id id - ID of compound
  *                 string abbrev - abbreviated name of compound
  *                 string name - primary name of compound

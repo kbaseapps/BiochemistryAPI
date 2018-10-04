@@ -1,6 +1,7 @@
 import csv
 import logging
 import os
+import re
 from collections import defaultdict, namedtuple, OrderedDict
 
 from rdkit import RDLogger
@@ -11,6 +12,7 @@ from rdkit.DataStructs import FingerprintSimilarity
 rdk_lg = RDLogger.logger()
 rdk_lg.setLevel(RDLogger.CRITICAL)
 logging.basicConfig(level=logging.INFO)
+ttable = str.maketrans("", "", "_- ")
 
 
 def check_param(in_params, req_param, opt_param=list()):
@@ -37,7 +39,18 @@ def dict_from_file(path, key='id', dialect='excel-tab'):
     if not os.path.exists(path):
         raise ValueError("File not found: {}".format(path))
     reader = csv.DictReader(open(path), dialect=dialect)
-    return OrderedDict([(x[key], x) for x in reader])
+    id_dict = OrderedDict()
+    alias_dict = defaultdict(set)
+    for line in reader:
+        id_dict[line['id']] = line
+        if line.get('name'):
+            alias_dict[line['name'].lower().translate(ttable)].add(line['id'])
+        if line.get('abbreviation'):
+            alias_dict[line['name'].lower().translate(ttable)].add(line['id'])
+        if line.get('aliases'):
+            for match in re.findall('"\S+?:(\S+?)"', line['aliases']):
+                alias_dict[match.lower().translate(ttable)].add(line['id'])
+    return id_dict, alias_dict
 
 
 def alias_dict_from_file(path, dialect='excel-tab'):
@@ -123,3 +136,13 @@ def depict_compound(structure, size=(300, 300)):
     dwr.DrawMolecule(mol)
     dwr.FinishDrawing()
     return dwr.GetDrawingText().replace('svg:', '')
+
+
+def get_3d_mol(structure):
+    mol = _get_mol(structure)
+    if not mol:
+        return ""
+    AllChem.AddHs(mol)
+    AllChem.EmbedMolecule(mol, AllChem.ETKDG())
+    AllChem.RemoveHs(mol)
+    return AllChem.MolToMolBlock(mol)
