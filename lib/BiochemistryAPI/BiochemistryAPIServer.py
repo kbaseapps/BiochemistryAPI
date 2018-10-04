@@ -351,6 +351,10 @@ class Application(object):
                              name='BiochemistryAPI.search_compounds',
                              types=[dict])
         self.method_authentication['BiochemistryAPI.search_compounds'] = 'none'  # noqa
+        self.rpc_service.add(impl_BiochemistryAPI.search_reactions,
+                             name='BiochemistryAPI.search_reactions',
+                             types=[dict])
+        self.method_authentication['BiochemistryAPI.search_reactions'] = 'none'  # noqa
         self.rpc_service.add(impl_BiochemistryAPI.substructure_search,
                              name='BiochemistryAPI.substructure_search',
                              types=[dict])

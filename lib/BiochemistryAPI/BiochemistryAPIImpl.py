@@ -23,9 +23,9 @@ class BiochemistryAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.1.3"
+    VERSION = "0.2.0"
     GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
-    GIT_COMMIT_HASH = "7dcfe665800b5782e149722390efcc8f5787e196"
+    GIT_COMMIT_HASH = "2e65c8f3303d63668f9688fc15910db3c934d13b"
 
     #BEGIN_CLASS_HEADER
 
@@ -154,8 +154,9 @@ class BiochemistryAPI:
         Returns compounds which match a string
         :param params: instance of type "search_compounds_params" (Input
            parameters for the "search_compounds" function. string query - a
-           query string to match against names & aliases) -> structure:
-           parameter "query" of String
+           query string to match against names & aliases int limit - maximum
+           number of results to return, defaults to 10) -> structure:
+           parameter "query" of String, parameter "limit" of Long
         :returns: instance of list of type "Compound" (Data structures for
            compounds compound_id id - ID of compound string abbrev -
            abbreviated name of compound string name - primary name of
@@ -175,9 +176,13 @@ class BiochemistryAPI:
         #BEGIN search_compounds
         logging.info("Starting search_compounds")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['query'])
-        normed_query = params['query'].lower().translate(utils.ttable)
-        out_compounds = [self.compounds[cid] for cid in self.comp_search_dict.get(normed_query, [])]
+        utils.check_param(params, ['query'], ['limit'])
+        limit = params.get('limit', 10)
+        normed_query = params['query'].strip().lower().translate(utils.ttable)
+        matching_ids = self.comp_search_dict.get(normed_query, [])
+        if len(matching_ids) > limit:
+            matching_ids = matching_ids[:limit]
+        out_compounds = [self.compounds[cid] for cid in matching_ids]
         #END search_compounds
 
         # At some point might do deeper type checking...
@@ -186,6 +191,52 @@ class BiochemistryAPI:
                              'out_compounds is not type list as required.')
         # return the results
         return [out_compounds]
+
+    def search_reactions(self, ctx, params):
+        """
+        Returns reactions which match a string
+        :param params: instance of type "search_reactions_params" (Input
+           parameters for the "search_reactions" function. string query - a
+           query string to match against names & aliases int limit - maximum
+           number of results to return, defaults to 10) -> structure:
+           parameter "query" of String, parameter "limit" of Long
+        :returns: instance of list of type "Reaction" (Data structures for
+           reactions reaction_id id - ID of reaction string name - primary
+           name of reaction string abbrev - abbreviated name of reaction
+           list<string> enzymes - list of EC numbers for reaction string
+           direction - directionality of reaction string reversibility -
+           reversibility of reaction float deltaG - estimated delta G of
+           reaction float deltaGErr - uncertainty in estimated delta G of
+           reaction string equation - reaction equation in terms of compound
+           IDs string definition - reaction equation in terms of compound
+           names) -> structure: parameter "id" of type "reaction_id" (A
+           string identifier used for a reaction in a KBase biochemistry.),
+           parameter "name" of String, parameter "abbrev" of String,
+           parameter "enzymes" of list of String, parameter "direction" of
+           String, parameter "reversibility" of String, parameter "deltaG" of
+           Double, parameter "deltaGErr" of Double, parameter "equation" of
+           String, parameter "definition" of String
+        """
+        # ctx is the context object
+        # return variables are: out_reactions
+        #BEGIN search_reactions
+        logging.info("Starting search_reactions")
+        logging.info("Params: {}".format(params))
+        utils.check_param(params, ['query'], ['limit'])
+        limit = params.get('limit', 10)
+        normed_query = params['query'].strip().lower().translate(utils.ttable)
+        matching_ids = self.rxn_search_dict.get(normed_query, [])
+        if len(matching_ids) > limit:
+            matching_ids = matching_ids[:limit]
+        out_reactions = [self.reactions[cid] for cid in matching_ids]
+        #END search_reactions
+
+        # At some point might do deeper type checking...
+        if not isinstance(out_reactions, list):
+            raise ValueError('Method search_reactions return value ' +
+                             'out_reactions is not type list as required.')
+        # return the results
+        return [out_reactions]
 
     def substructure_search(self, ctx, params):
         """
