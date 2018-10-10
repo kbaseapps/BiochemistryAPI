@@ -95,8 +95,9 @@ class BiochemistryAPI(object):
         Returns compounds which match a string
         :param params: instance of type "search_compounds_params" (Input
            parameters for the "search_compounds" function. string query - a
-           query string to match against names & aliases) -> structure:
-           parameter "query" of String
+           query string to match against names & aliases int limit - maximum
+           number of results to return, defaults to 10) -> structure:
+           parameter "query" of String, parameter "limit" of Long
         :returns: instance of list of type "Compound" (Data structures for
            compounds compound_id id - ID of compound string abbrev -
            abbreviated name of compound string name - primary name of
@@ -113,6 +114,35 @@ class BiochemistryAPI(object):
         """
         return self._client.call_method(
             'BiochemistryAPI.search_compounds',
+            [params], self._service_ver, context)
+
+    def search_reactions(self, params, context=None):
+        """
+        Returns reactions which match a string
+        :param params: instance of type "search_reactions_params" (Input
+           parameters for the "search_reactions" function. string query - a
+           query string to match against names & aliases int limit - maximum
+           number of results to return, defaults to 10) -> structure:
+           parameter "query" of String, parameter "limit" of Long
+        :returns: instance of list of type "Reaction" (Data structures for
+           reactions reaction_id id - ID of reaction string name - primary
+           name of reaction string abbrev - abbreviated name of reaction
+           list<string> enzymes - list of EC numbers for reaction string
+           direction - directionality of reaction string reversibility -
+           reversibility of reaction float deltaG - estimated delta G of
+           reaction float deltaGErr - uncertainty in estimated delta G of
+           reaction string equation - reaction equation in terms of compound
+           IDs string definition - reaction equation in terms of compound
+           names) -> structure: parameter "id" of type "reaction_id" (A
+           string identifier used for a reaction in a KBase biochemistry.),
+           parameter "name" of String, parameter "abbrev" of String,
+           parameter "enzymes" of list of String, parameter "direction" of
+           String, parameter "reversibility" of String, parameter "deltaG" of
+           Double, parameter "deltaGErr" of Double, parameter "equation" of
+           String, parameter "definition" of String
+        """
+        return self._client.call_method(
+            'BiochemistryAPI.search_reactions',
             [params], self._service_ver, context)
 
     def substructure_search(self, params, context=None):

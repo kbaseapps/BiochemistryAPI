@@ -96,14 +96,30 @@ module BiochemistryAPI {
     /*
 	    Input parameters for the "search_compounds" function.
 		string query - a query string to match against names & aliases
+		int limit - maximum number of results to return, defaults to 10
 	*/
     typedef structure {
 		string query;
+		int limit;
     } search_compounds_params;
     /*
     	Returns compounds which match a string
     */
     funcdef search_compounds(search_compounds_params params) returns (list<Compound> out_compounds);
+
+    /*
+	    Input parameters for the "search_reactions" function.
+		string query - a query string to match against names & aliases
+		int limit - maximum number of results to return, defaults to 10
+	*/
+    typedef structure {
+		string query;
+		int limit;
+    } search_reactions_params;
+    /*
+    	Returns reactions which match a string
+    */
+    funcdef search_reactions(search_reactions_params params) returns (list<Reaction> out_reactions);
 
     typedef structure {
 		mol_structure query;

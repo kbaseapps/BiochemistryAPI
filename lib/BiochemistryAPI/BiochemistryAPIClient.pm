@@ -339,6 +339,7 @@ $params is a BiochemistryAPI.search_compounds_params
 $out_compounds is a reference to a list where each element is a BiochemistryAPI.Compound
 search_compounds_params is a reference to a hash where the following keys are defined:
 	query has a value which is a string
+	limit has a value which is an int
 Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a BiochemistryAPI.compound_id
 	abbrev has a value which is a string
@@ -360,6 +361,7 @@ $params is a BiochemistryAPI.search_compounds_params
 $out_compounds is a reference to a list where each element is a BiochemistryAPI.Compound
 search_compounds_params is a reference to a hash where the following keys are defined:
 	query has a value which is a string
+	limit has a value which is an int
 Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a BiochemistryAPI.compound_id
 	abbrev has a value which is a string
@@ -424,6 +426,118 @@ Returns compounds which match a string
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method search_compounds",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'search_compounds',
+				       );
+    }
+}
+ 
+
+
+=head2 search_reactions
+
+  $out_reactions = $obj->search_reactions($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a BiochemistryAPI.search_reactions_params
+$out_reactions is a reference to a list where each element is a BiochemistryAPI.Reaction
+search_reactions_params is a reference to a hash where the following keys are defined:
+	query has a value which is a string
+	limit has a value which is an int
+Reaction is a reference to a hash where the following keys are defined:
+	id has a value which is a BiochemistryAPI.reaction_id
+	name has a value which is a string
+	abbrev has a value which is a string
+	enzymes has a value which is a reference to a list where each element is a string
+	direction has a value which is a string
+	reversibility has a value which is a string
+	deltaG has a value which is a float
+	deltaGErr has a value which is a float
+	equation has a value which is a string
+	definition has a value which is a string
+reaction_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a BiochemistryAPI.search_reactions_params
+$out_reactions is a reference to a list where each element is a BiochemistryAPI.Reaction
+search_reactions_params is a reference to a hash where the following keys are defined:
+	query has a value which is a string
+	limit has a value which is an int
+Reaction is a reference to a hash where the following keys are defined:
+	id has a value which is a BiochemistryAPI.reaction_id
+	name has a value which is a string
+	abbrev has a value which is a string
+	enzymes has a value which is a reference to a list where each element is a string
+	direction has a value which is a string
+	reversibility has a value which is a string
+	deltaG has a value which is a float
+	deltaGErr has a value which is a float
+	equation has a value which is a string
+	definition has a value which is a string
+reaction_id is a string
+
+
+=end text
+
+=item Description
+
+Returns reactions which match a string
+
+=back
+
+=cut
+
+ sub search_reactions
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function search_reactions (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to search_reactions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'search_reactions');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "BiochemistryAPI.search_reactions",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'search_reactions',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method search_reactions",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'search_reactions',
 				       );
     }
 }
@@ -1175,6 +1289,7 @@ compounds has a value which is a reference to a list where each element is a Bio
 
 Input parameters for the "search_compounds" function.
     string query - a query string to match against names & aliases
+    int limit - maximum number of results to return, defaults to 10
 
 
 =item Definition
@@ -1184,6 +1299,7 @@ Input parameters for the "search_compounds" function.
 <pre>
 a reference to a hash where the following keys are defined:
 query has a value which is a string
+limit has a value which is an int
 
 </pre>
 
@@ -1193,6 +1309,46 @@ query has a value which is a string
 
 a reference to a hash where the following keys are defined:
 query has a value which is a string
+limit has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 search_reactions_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "search_reactions" function.
+    string query - a query string to match against names & aliases
+    int limit - maximum number of results to return, defaults to 10
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+query has a value which is a string
+limit has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+query has a value which is a string
+limit has a value which is an int
 
 
 =end text

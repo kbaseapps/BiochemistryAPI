@@ -7,6 +7,7 @@ RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
                      cairo \
                      nomkl \
                      rdkit
+RUN pip install boltons
 
 COPY ./ /kb/module
 RUN mkdir -p /kb/module/work
