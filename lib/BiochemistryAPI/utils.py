@@ -150,11 +150,16 @@ def depict_compound(structure, size=(300, 300)):
     return dwr.GetDrawingText().replace('svg:', '')
 
 
-def get_3d_mol(structure):
+def get_3d_mol(structure, output='mol', optimize=False):
     mol = _get_mol(structure)
     if not mol:
         return ""
     AllChem.AddHs(mol)
     AllChem.EmbedMolecule(mol, AllChem.ETKDG())
+    if optimize:
+        AllChem.MMFFOptimizeMolecule(mol)
     AllChem.RemoveHs(mol)
-    return AllChem.MolToMolBlock(mol)
+    if output == 'mol':
+        return AllChem.MolToMolBlock(mol)
+    if output == 'pdb':
+        return AllChem.MolToPDBBlock(mol)

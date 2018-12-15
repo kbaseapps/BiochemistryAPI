@@ -23,9 +23,9 @@ class BiochemistryAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.2.0"
+    VERSION = "0.3.0"
     GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
-    GIT_COMMIT_HASH = "2e65c8f3303d63668f9688fc15910db3c934d13b"
+    GIT_COMMIT_HASH = "410765239da8490da9476411476beb7f2d60140d"
 
     #BEGIN_CLASS_HEADER
 
@@ -296,8 +296,8 @@ class BiochemistryAPI:
         """
         Returns a list of depictions for the compound_structures in SVG format
         :param params: instance of type "depict_compounds_params" ->
-           structure: parameter "compound_structures" of list of type
-           "mol_structure" (A molecule structure in InChI or SMILES format)
+           structure: parameter "structures" of list of type "mol_structure"
+           (A molecule structure in InChI or SMILES format)
         :returns: instance of list of String
         """
         # ctx is the context object
@@ -318,27 +318,33 @@ class BiochemistryAPI:
 
     def calculate_3D_coords(self, ctx, params):
         """
-        Returns molecules with 3D coordinates in MolBlock format
+        Returns molecules with 3D coordinates.
+        list<mol_structure> compound_structures: compounds in InChI or SMILES
+            bool optimize: should forcefeild optimization be run?
+            string output: The outpuf format, one of 'mol' or 'pdb'
         :param params: instance of type "calculate_3D_coords_params" ->
-           structure: parameter "compound_structures" of list of type
-           "mol_structure" (A molecule structure in InChI or SMILES format)
+           structure: parameter "structures" of list of type "mol_structure"
+           (A molecule structure in InChI or SMILES format), parameter
+           "optimize" of type "bool" (@range(0,1)), parameter "output" of
+           String
         :returns: instance of list of String
         """
         # ctx is the context object
-        # return variables are: mol_blocks
+        # return variables are: output
         #BEGIN calculate_3D_coords
         logging.info("Starting calculate_3D_coords")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ['structures'])
-        mol_blocks = [utils.get_3d_mol(struct) for struct in params['structures']]
+        output = [utils.get_3d_mol(struct, params.get('output', 'mol'), params.get('optimize'),)
+                  for struct in params['structures']]
         #END calculate_3D_coords
 
         # At some point might do deeper type checking...
-        if not isinstance(mol_blocks, list):
+        if not isinstance(output, list):
             raise ValueError('Method calculate_3D_coords return value ' +
-                             'mol_blocks is not type list as required.')
+                             'output is not type list as required.')
         # return the results
-        return [mol_blocks]
+        return [output]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

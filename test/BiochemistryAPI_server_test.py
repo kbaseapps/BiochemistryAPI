@@ -182,3 +182,10 @@ class BiochemistryAPITest(unittest.TestCase):
         self.assertIn('  -1.1054   -0.2402   -0.0000 O', mols[0])
         self.assertIn('  -0.3889    1.2404    0.0153 O', mols[1])
         self.assertEqual(mols[2], '')
+
+    def test_calculate_3D_pdb(self):
+        mols = self.getImpl().calculate_3D_coords(
+            self.ctx, {'structures': ['C(=O)O'], 'optimize': 'True', 'output': 'pdb'})[0]
+        self.assertEqual(len(mols), 1)
+        print(mols[0])
+        self.assertIn('HETATM    2  O1  UNL     1      -1.109  -0.233   0.000  1.00  0.00', mols[0])
