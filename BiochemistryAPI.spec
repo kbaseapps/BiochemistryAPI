@@ -3,6 +3,9 @@ A KBase module: BiochemistryAPI
 */
 
 module BiochemistryAPI {
+    /* @range(0,1)*/
+    typedef int bool;
+
     /* An identifier for compounds in the KBase biochemistry database. e.g. cpd00001 */
 	typedef string compound_id;
 
@@ -147,7 +150,7 @@ module BiochemistryAPI {
 
 
     typedef structure {
-		list<mol_structure> compound_structures;
+		list<mol_structure> structures;
     } depict_compounds_params;
     /*
     	Returns a list of depictions for the compound_structures in SVG format
@@ -155,10 +158,16 @@ module BiochemistryAPI {
     funcdef depict_compounds(depict_compounds_params params) returns (list<string> depictions);
 
     typedef structure {
-		list<mol_structure> compound_structures;
+		list<mol_structure> structures;
+		bool optimize;
+		string output;
     } calculate_3D_coords_params;
     /*
-    	Returns molecules with 3D coordinates in MolBlock format
+    	Returns molecules with 3D coordinates.
+
+    	list<mol_structure> compound_structures: compounds in InChI or SMILES
+		bool optimize: should forcefeild optimization be run?
+		string output: The outpuf format, one of 'mol' or 'pdb'
     */
-    funcdef calculate_3D_coords(calculate_3D_coords_params params) returns (list<string> mol_blocks);
+    funcdef calculate_3D_coords(calculate_3D_coords_params params) returns (list<string> output);
 };
