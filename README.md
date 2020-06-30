@@ -5,6 +5,10 @@
 This module serves Biochemistry data for KBase
 
 ## Release Notes
+
+#### v0.4.0 (06/30/20)
+* Major update of data from ModelSEED Biochemistry Database
+
 #### 0.3.0 (10/04/18)
 - Updated the search methods to approximate a poor man's search engine. Terms are tokenized on _-; and space, and matching results returned in the same order as they appear in the source. 
 - Added a optional limit on search results

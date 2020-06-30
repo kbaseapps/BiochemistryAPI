@@ -1,8 +1,24 @@
-# BiochemistryAPI release notes
+## BiochemistryAPI release notes
 =========================================
 
-## v0.4.0
+#### v0.4.0 (06/30/20)
 * Major update of data from ModelSEED Biochemistry Database
 
-## v0.3.1
-* Module created, developed, and released by jjeffryes
+#### 0.3.0 (10/04/18)
+- Updated the search methods to approximate a poor man's search engine. Terms are tokenized on _-; and space, and matching results returned in the same order as they appear in the source. 
+- Added a optional limit on search results
+- Added a search_reactions method
+
+#### 0.2.0 (06/26/18)
+- convert to Python3 module
+
+#### 0.1.4 (06/25/18)
+- Add basic compound search methods
+- Add 3D compound generation method
+
+#### 0.1.3 (05/04/18)
+- Add the ability to perform similarity and substructure searches
+
+#### 0.1.2 (10/20/17)
+Adds the ability to generate SVG depictions of chemical structures submitted in
+SMILES and InChI format.
