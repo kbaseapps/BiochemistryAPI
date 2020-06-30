@@ -11,7 +11,7 @@ module-version:
     0.4.0
 
 owners:
-    [jjeffryes, bsadkhin]
+    [jjeffryes, bsadkhin, seaver]
 
 service-config:
   dynamic-service: true
