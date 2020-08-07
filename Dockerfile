@@ -1,5 +1,5 @@
 FROM kbase/sdkbase2:python
-MAINTAINER KBase Developer
+MAINTAINER KBase Developer2
 
 # -----------------------------------------
 RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
