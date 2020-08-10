@@ -3,7 +3,7 @@ MAINTAINER KBase Developer2
 
 # -----------------------------------------
 RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
-    conda install -y nose \
+    conda install -y nose uswgi \
                      cairo \
                      nomkl \
                      rdkit
