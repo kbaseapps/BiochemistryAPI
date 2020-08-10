@@ -2,11 +2,13 @@ FROM kbase/sdkbase2:python
 MAINTAINER KBase Developer2
 
 # -----------------------------------------
+RUN apt-get update
 RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
-    conda install -y nose uswgi \
+    conda install -y nose  \
                      cairo \
                      nomkl \
-                     rdkit
+                     rdkit \
+                     uwsgi
 RUN pip install boltons jinja2
 
 COPY ./ /kb/module
