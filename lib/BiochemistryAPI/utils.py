@@ -99,7 +99,8 @@ def make_mol_tuples(
     compound_dict, id_key="id", struct_key="structure", struct_type="inchi"
 ):
     """
-    Creates named tuples with (compound_id, RDKit Mol Object) from a dict with SMILES or InChI
+    Creates named tuples with (compound_id, RDKit Mol Object)
+     from a dict with SMILES or InChI
     """
     MolTuple = namedtuple("MolTuple", "id mol maccs_fp rdkit_fp")
     tups = []
@@ -120,12 +121,13 @@ def make_mol_tuples(
 def substructure_search(query, structures):
     """Performs substructure search on 'query' in 'structures'"""
     pattern = AllChem.MolFromSmarts(query)
-    return [x.id for x in structures if x.mol and x.mol.HasSubstructMatch(pattern)]
+    return [x.id for x in structures
+            if x.mol and x.mol.HasSubstructMatch(pattern)]
 
 
 def similarity_search(query, structures, fp_type="maccs", min_similarity=0.8):
-    """Perform return compound ids where tanimoto similarity of fingerprint 'fp_type is greater
-    than 'min_similarity'"""
+    """Perform return compound ids where tanimoto similarity of fingerprint
+     'fp_type is greater than 'min_similarity'"""
     if not isinstance(min_similarity, float) or not 0 <= min_similarity <= 1.0:
         raise ValueError(
             "Invalid min_similarity. Value must be a float between 0 and 1."
@@ -146,7 +148,8 @@ def similarity_search(query, structures, fp_type="maccs", min_similarity=0.8):
         ]
     else:
         fp_types = ", ".join(("maccs", "rdkit"))
-        raise ValueError("Invalid fingerprint type: choose one of {}".format(fp_types))
+        raise ValueError("Invalid fingerprint type: "
+                         "choose one of {}".format(fp_types))
 
 
 def depict_compound(structure, size=(300, 300)):

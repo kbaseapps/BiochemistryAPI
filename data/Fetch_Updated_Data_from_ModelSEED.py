@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 from urllib.request import urlopen
-import sys, json
+import json
 
 MSD_git_url = "https://raw.githubusercontent.com/ModelSEED/ModelSEEDDatabase/"
 MSD_commit = "master"
 
-##
-## Compounds
-##
+#
+# Compounds
+#
 file = urlopen(MSD_git_url + MSD_commit + "/Biochemistry/compounds.json")
 compounds = json.load(file)
 
@@ -51,9 +51,9 @@ with open("compounds.tsv", "w") as cpd_fh:
         cpd_fh.write("\t".join(line_values) + "\n")
 cpd_fh.close()
 
-##
-## Reactions
-##
+#
+# Reactions
+#
 file = urlopen(MSD_git_url + MSD_commit + "/Biochemistry/reactions.json")
 reactions = json.load(file)
 
@@ -97,9 +97,9 @@ with open("reactions.tsv", "w") as rxn_fh:
         rxn_fh.write("\t".join(line_values) + "\n")
 rxn_fh.close()
 
-##
-## Aliases
-##
+#
+# Aliases
+#
 alias_headers = ["MS ID", "Old MS ID", "External ID", "Source"]
 
 with open("Compounds_Aliases.tsv", "w") as cpda_fh:

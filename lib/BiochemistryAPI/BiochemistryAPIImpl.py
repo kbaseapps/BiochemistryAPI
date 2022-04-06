@@ -271,7 +271,8 @@ class BiochemistryAPI:
         logging.info("Starting substructure_search")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["query"])
-        matching_ids = utils.substructure_search(params["query"], self.structures)
+        matching_ids = utils.substructure_search(params["query"],
+                                                 self.structures)
         # END substructure_search
 
         # At some point might do deeper type checking...
@@ -285,7 +286,8 @@ class BiochemistryAPI:
 
     def similarity_search(self, ctx, params):
         """
-        Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+        Returns compound ids for compounds that have greater fingerprint
+         similarity than the min_similarity threshold
         :param params: instance of type "similarity_search_params"
            (mol_structure query: Either InChI or SMILES string string
            fp_type: Either MACCS or Morgan fingerprints float min_similarity:
@@ -328,7 +330,8 @@ class BiochemistryAPI:
         logging.info("Starting depict_compounds")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["structures"])
-        depictions = [utils.depict_compound(struct) for struct in params["structures"]]
+        depictions = [utils.depict_compound(struct)
+                      for struct in params["structures"]]
         # END depict_compounds
 
         # At some point might do deeper type checking...
