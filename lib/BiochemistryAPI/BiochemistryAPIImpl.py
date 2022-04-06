@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-#BEGIN_HEADER
+# BEGIN_HEADER
 import logging
 
 from BiochemistryAPI import utils
 
 logging.basicConfig(level=logging.INFO)
-#END_HEADER
+# END_HEADER
 
 
 class BiochemistryAPI:
-    '''
+    """
     Module Name:
     BiochemistryAPI
 
     Module Description:
     A KBase module: BiochemistryAPI
-    '''
+    """
 
     ######## WARNING FOR GEVENT USERS ####### noqa
     # Since asynchronous IO can lead to methods - even the same method -
@@ -27,33 +27,43 @@ class BiochemistryAPI:
     GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
     GIT_COMMIT_HASH = "410765239da8490da9476411476beb7f2d60140d"
 
-    #BEGIN_CLASS_HEADER
+    # BEGIN_CLASS_HEADER
 
-    #END_CLASS_HEADER
+    # END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
     # be found
     def __init__(self, config):
-        #BEGIN_CONSTRUCTOR
+        # BEGIN_CONSTRUCTOR
         self.config = config
-        self.scratch = config['scratch']
-        data_dir = '/kb/module/data/'
-        self.compounds, self.comp_search_dict = utils.dict_from_file(data_dir + "compounds.tsv")
+        self.scratch = config["scratch"]
+        data_dir = "/kb/module/data/"
+        self.compounds, self.comp_search_dict = utils.dict_from_file(
+            data_dir + "compounds.tsv"
+        )
 
-        self.reactions, self.rxn_search_dict = utils.dict_from_file(data_dir + "reactions.tsv")
-        self.comp_aliases = utils.alias_dict_from_file(data_dir +
-                                                      "Compounds_Aliases.tsv")
-        self.rxn_aliases = utils.alias_dict_from_file(data_dir +
-                                                      "Reactions_Aliases.tsv")
-        self.ec_classes = utils.alias_dict_from_file(data_dir + 'Enzyme_Class_Reactions_Aliases.tsv')
+        self.reactions, self.rxn_search_dict = utils.dict_from_file(
+            data_dir + "reactions.tsv"
+        )
+        self.comp_aliases = utils.alias_dict_from_file(
+            data_dir + "Compounds_Aliases.tsv"
+        )
+        self.rxn_aliases = utils.alias_dict_from_file(
+            data_dir + "Reactions_Aliases.tsv"
+        )
+        self.ec_classes = utils.alias_dict_from_file(
+            data_dir + "Enzyme_Class_Reactions_Aliases.tsv"
+        )
 
-        logging.info("Loaded {} compounds and {} reactions".format(
-            len(self.compounds), len(self.reactions)))
+        logging.info(
+            "Loaded {} compounds and {} reactions".format(
+                len(self.compounds), len(self.reactions)
+            )
+        )
         self.structures = utils.make_mol_tuples(self.compounds.values())
         logging.info("Cached compound structures")
-        #END_CONSTRUCTOR
+        # END_CONSTRUCTOR
         pass
-
 
     def get_reactions(self, ctx, params):
         """
@@ -83,24 +93,26 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_reactions
-        #BEGIN get_reactions
+        # BEGIN get_reactions
         logging.info("Starting get_reactions")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['reactions'])
+        utils.check_param(params, ["reactions"])
         out_reactions = []
-        for x in params['reactions']:
-            id = x.split('/')[-1]
+        for x in params["reactions"]:
+            id = x.split("/")[-1]
             rxn = self.reactions.get(id, None)
             if rxn:
-                rxn['aliases'] = self.rxn_aliases.get(id, '')
-                rxn['enzymes'] = self.ec_classes.get(id, '')
+                rxn["aliases"] = self.rxn_aliases.get(id, "")
+                rxn["enzymes"] = self.ec_classes.get(id, "")
             out_reactions.append(rxn)
-        #END get_reactions
+        # END get_reactions
 
         # At some point might do deeper type checking...
         if not isinstance(out_reactions, list):
-            raise ValueError('Method get_reactions return value ' +
-                             'out_reactions is not type list as required.')
+            raise ValueError(
+                "Method get_reactions return value "
+                + "out_reactions is not type list as required."
+            )
         # return the results
         return [out_reactions]
 
@@ -129,23 +141,25 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_compounds
-        #BEGIN get_compounds
+        # BEGIN get_compounds
         logging.info("Starting get_compounds")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['compounds'])
+        utils.check_param(params, ["compounds"])
         out_compounds = []
-        for x in params['compounds']:
-            id = x.split('/')[-1]
+        for x in params["compounds"]:
+            id = x.split("/")[-1]
             comp = self.compounds.get(id, None)
             if comp:
-                comp['aliases'] = self.comp_aliases.get(id, '')
+                comp["aliases"] = self.comp_aliases.get(id, "")
             out_compounds.append(comp)
-        #END get_compounds
+        # END get_compounds
 
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
-            raise ValueError('Method get_compounds return value ' +
-                             'out_compounds is not type list as required.')
+            raise ValueError(
+                "Method get_compounds return value "
+                + "out_compounds is not type list as required."
+            )
         # return the results
         return [out_compounds]
 
@@ -173,22 +187,24 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_compounds
-        #BEGIN search_compounds
+        # BEGIN search_compounds
         logging.info("Starting search_compounds")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['query'], ['limit'])
-        limit = params.get('limit', 10)
-        normed_query = params['query'].strip().lower().translate(utils.ttable)
+        utils.check_param(params, ["query"], ["limit"])
+        limit = params.get("limit", 10)
+        normed_query = params["query"].strip().lower().translate(utils.ttable)
         matching_ids = self.comp_search_dict.get(normed_query, [])
         if len(matching_ids) > limit:
             matching_ids = matching_ids[:limit]
         out_compounds = [self.compounds[cid] for cid in matching_ids]
-        #END search_compounds
+        # END search_compounds
 
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
-            raise ValueError('Method search_compounds return value ' +
-                             'out_compounds is not type list as required.')
+            raise ValueError(
+                "Method search_compounds return value "
+                + "out_compounds is not type list as required."
+            )
         # return the results
         return [out_compounds]
 
@@ -219,22 +235,24 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_reactions
-        #BEGIN search_reactions
+        # BEGIN search_reactions
         logging.info("Starting search_reactions")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['query'], ['limit'])
-        limit = params.get('limit', 10)
-        normed_query = params['query'].strip().lower().translate(utils.ttable)
+        utils.check_param(params, ["query"], ["limit"])
+        limit = params.get("limit", 10)
+        normed_query = params["query"].strip().lower().translate(utils.ttable)
         matching_ids = self.rxn_search_dict.get(normed_query, [])
         if len(matching_ids) > limit:
             matching_ids = matching_ids[:limit]
         out_reactions = [self.reactions[cid] for cid in matching_ids]
-        #END search_reactions
+        # END search_reactions
 
         # At some point might do deeper type checking...
         if not isinstance(out_reactions, list):
-            raise ValueError('Method search_reactions return value ' +
-                             'out_reactions is not type list as required.')
+            raise ValueError(
+                "Method search_reactions return value "
+                + "out_reactions is not type list as required."
+            )
         # return the results
         return [out_reactions]
 
@@ -249,17 +267,19 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: matching_ids
-        #BEGIN substructure_search
+        # BEGIN substructure_search
         logging.info("Starting substructure_search")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['query'])
-        matching_ids = utils.substructure_search(params['query'], self.structures)
-        #END substructure_search
+        utils.check_param(params, ["query"])
+        matching_ids = utils.substructure_search(params["query"], self.structures)
+        # END substructure_search
 
         # At some point might do deeper type checking...
         if not isinstance(matching_ids, list):
-            raise ValueError('Method substructure_search return value ' +
-                             'matching_ids is not type list as required.')
+            raise ValueError(
+                "Method substructure_search return value "
+                + "matching_ids is not type list as required."
+            )
         # return the results
         return [matching_ids]
 
@@ -277,18 +297,20 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: matching_ids
-        #BEGIN similarity_search
+        # BEGIN similarity_search
         logging.info("Starting similarity_search")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['query'], ['fp_type', 'min_similarity'])
-        params['structures'] = self.structures
+        utils.check_param(params, ["query"], ["fp_type", "min_similarity"])
+        params["structures"] = self.structures
         matching_ids = utils.similarity_search(**params)
-        #END similarity_search
+        # END similarity_search
 
         # At some point might do deeper type checking...
         if not isinstance(matching_ids, list):
-            raise ValueError('Method similarity_search return value ' +
-                             'matching_ids is not type list as required.')
+            raise ValueError(
+                "Method similarity_search return value "
+                + "matching_ids is not type list as required."
+            )
         # return the results
         return [matching_ids]
 
@@ -302,17 +324,19 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: depictions
-        #BEGIN depict_compounds
+        # BEGIN depict_compounds
         logging.info("Starting depict_compounds")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['structures'])
-        depictions = [utils.depict_compound(struct) for struct in params['structures']]
-        #END depict_compounds
+        utils.check_param(params, ["structures"])
+        depictions = [utils.depict_compound(struct) for struct in params["structures"]]
+        # END depict_compounds
 
         # At some point might do deeper type checking...
         if not isinstance(depictions, list):
-            raise ValueError('Method depict_compounds return value ' +
-                             'depictions is not type list as required.')
+            raise ValueError(
+                "Method depict_compounds return value "
+                + "depictions is not type list as required."
+            )
         # return the results
         return [depictions]
 
@@ -331,26 +355,37 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: output
-        #BEGIN calculate_3D_coords
+        # BEGIN calculate_3D_coords
         logging.info("Starting calculate_3D_coords")
         logging.info("Params: {}".format(params))
-        utils.check_param(params, ['structures'])
-        output = [utils.get_3d_mol(struct, params.get('output', 'mol'), params.get('optimize'),)
-                  for struct in params['structures']]
-        #END calculate_3D_coords
+        utils.check_param(params, ["structures"])
+        output = [
+            utils.get_3d_mol(
+                struct,
+                params.get("output", "mol"),
+                params.get("optimize"),
+            )
+            for struct in params["structures"]
+        ]
+        # END calculate_3D_coords
 
         # At some point might do deeper type checking...
         if not isinstance(output, list):
-            raise ValueError('Method calculate_3D_coords return value ' +
-                             'output is not type list as required.')
+            raise ValueError(
+                "Method calculate_3D_coords return value "
+                + "output is not type list as required."
+            )
         # return the results
         return [output]
+
     def status(self, ctx):
-        #BEGIN_STATUS
-        returnVal = {'state': "OK",
-                     'message': "",
-                     'version': self.VERSION,
-                     'git_url': self.GIT_URL,
-                     'git_commit_hash': self.GIT_COMMIT_HASH}
-        #END_STATUS
+        # BEGIN_STATUS
+        returnVal = {
+            "state": "OK",
+            "message": "",
+            "version": self.VERSION,
+            "git_url": self.GIT_URL,
+            "git_commit_hash": self.GIT_COMMIT_HASH,
+        }
+        # END_STATUS
         return [returnVal]
