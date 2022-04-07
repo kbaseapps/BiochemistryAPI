@@ -9,13 +9,13 @@ logging.basicConfig(level=logging.INFO)
 
 
 class BiochemistryAPI:
-    """
+    '''
     Module Name:
     BiochemistryAPI
 
     Module Description:
     A KBase module: BiochemistryAPI
-    """
+    '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
     # Since asynchronous IO can lead to methods - even the same method -
@@ -23,9 +23,9 @@ class BiochemistryAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.3.0"
-    GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
-    GIT_COMMIT_HASH = "410765239da8490da9476411476beb7f2d60140d"
+    VERSION = "0.4.0"
+    GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI"
+    GIT_COMMIT_HASH = "37694ffe8356526aaa52c72f78a7db811e9f4598"
 
     #BEGIN_CLASS_HEADER
 
@@ -64,6 +64,7 @@ class BiochemistryAPI:
         logging.info("Cached compound structures")
         #END_CONSTRUCTOR
         pass
+
 
     def get_reactions(self, ctx, params):
         """
@@ -109,10 +110,8 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(out_reactions, list):
-            raise ValueError(
-                "Method get_reactions return value "
-                + "out_reactions is not type list as required."
-            )
+            raise ValueError('Method get_reactions return value ' +
+                             'out_reactions is not type list as required.')
         # return the results
         return [out_reactions]
 
@@ -156,10 +155,8 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
-            raise ValueError(
-                "Method get_compounds return value "
-                + "out_compounds is not type list as required."
-            )
+            raise ValueError('Method get_compounds return value ' +
+                             'out_compounds is not type list as required.')
         # return the results
         return [out_compounds]
 
@@ -201,10 +198,8 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
-            raise ValueError(
-                "Method search_compounds return value "
-                + "out_compounds is not type list as required."
-            )
+            raise ValueError('Method search_compounds return value ' +
+                             'out_compounds is not type list as required.')
         # return the results
         return [out_compounds]
 
@@ -249,10 +244,8 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(out_reactions, list):
-            raise ValueError(
-                "Method search_reactions return value "
-                + "out_reactions is not type list as required."
-            )
+            raise ValueError('Method search_reactions return value ' +
+                             'out_reactions is not type list as required.')
         # return the results
         return [out_reactions]
 
@@ -277,20 +270,18 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(matching_ids, list):
-            raise ValueError(
-                "Method substructure_search return value "
-                + "matching_ids is not type list as required."
-            )
+            raise ValueError('Method substructure_search return value ' +
+                             'matching_ids is not type list as required.')
         # return the results
         return [matching_ids]
 
     def similarity_search(self, ctx, params):
         """
         Returns compound ids for compounds that have greater fingerprint
-         similarity than the min_similarity threshold
+        similarity than the min_similarity threshold
         :param params: instance of type "similarity_search_params"
            (mol_structure query: Either InChI or SMILES string string
-           fp_type: Either MACCS or Morgan fingerprints float min_similarity:
+           fp_type: Either MACCS or RDKit fingerprints float min_similarity:
            In range 0-1) -> structure: parameter "query" of type
            "mol_structure" (A molecule structure in InChI or SMILES format),
            parameter "fp_type" of String, parameter "min_similarity" of Double
@@ -309,10 +300,8 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(matching_ids, list):
-            raise ValueError(
-                "Method similarity_search return value "
-                + "matching_ids is not type list as required."
-            )
+            raise ValueError('Method similarity_search return value ' +
+                             'matching_ids is not type list as required.')
         # return the results
         return [matching_ids]
 
@@ -336,10 +325,8 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(depictions, list):
-            raise ValueError(
-                "Method depict_compounds return value "
-                + "depictions is not type list as required."
-            )
+            raise ValueError('Method depict_compounds return value ' +
+                             'depictions is not type list as required.')
         # return the results
         return [depictions]
 
@@ -374,13 +361,10 @@ class BiochemistryAPI:
 
         # At some point might do deeper type checking...
         if not isinstance(output, list):
-            raise ValueError(
-                "Method calculate_3D_coords return value "
-                + "output is not type list as required."
-            )
+            raise ValueError('Method calculate_3D_coords return value ' +
+                             'output is not type list as required.')
         # return the results
         return [output]
-
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {

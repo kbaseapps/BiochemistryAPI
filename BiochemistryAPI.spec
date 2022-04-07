@@ -134,7 +134,7 @@ module BiochemistryAPI {
 
     /*
         mol_structure query: Either InChI or SMILES string
-		string fp_type: Either MACCS or Morgan fingerprints
+		string fp_type: Either MACCS or RDKit fingerprints
 		float min_similarity: In range 0-1
     */
 
@@ -144,7 +144,8 @@ module BiochemistryAPI {
 		float min_similarity;
     } similarity_search_params;
     /*
-    	Returns compound ids for compounds that have greater fingerprint similarity than the min_similarity threshold
+        Returns compound ids for compounds that have greater fingerprint
+        similarity than the min_similarity threshold
     */
     funcdef similarity_search(similarity_search_params params) returns (list<compound_id> matching_ids);
 

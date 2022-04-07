@@ -143,6 +143,8 @@ def similarity_search(query, structures, fp_type="maccs", min_similarity=0.8):
             if FingerprintSimilarity(fp1, x.rdkit_fp) >= min_similarity
         ]
     else:
+        # NB: fp_type could also be Morgan
+        # but GetMorganFingerprint() is not yet implemented
         fp_types = ", ".join(("maccs", "rdkit"))
         raise ValueError("Invalid fingerprint type: "
                          "choose one of {}".format(fp_types))
