@@ -108,14 +108,7 @@ class BiochemistryAPITest(unittest.TestCase):
         assert len(cpds) == 3
         assert cpds[0]["id"] == "cpd00011"
         assert cpds[1]["id"] == "cpd00002"
-        assert cpds[0]["aliases"] == [
-            "BiGG1:co2",
-            "BiGG1:dco2",
-            "KEGG:C00011",
-            "MetaCyc:CARBON-DIOXIDE",
-            "PlantCyc:CARBON-DIOXIDE",
-            "BiGG:co2",
-        ]
+
         missing_col = {
             "name",
             "formula",
@@ -136,11 +129,6 @@ class BiochemistryAPITest(unittest.TestCase):
         assert len(rxns) == 3
         assert rxns[0]["id"] == "rxn00011"
         assert rxns[1]["id"] == "rxn00002"
-        assert rxns[0]["aliases"] == [
-            "KEGG:R00014",
-            "MetaCyc:RXN-12583.c",
-            "PlantCyc:RXN-12583.c",
-        ]
         assert rxns[0]["enzymes"] == ["1.2.4.1", "2.2.1.6", "4.1.1.1"]
         missing_col = {"name", "direction"} - set(rxns[0].keys())
         if missing_col:
