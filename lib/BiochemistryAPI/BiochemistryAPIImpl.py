@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# BEGIN_HEADER
+#BEGIN_HEADER
 import logging
 
 from BiochemistryAPI import utils
 
 logging.basicConfig(level=logging.INFO)
-# END_HEADER
+#END_HEADER
 
 
 class BiochemistryAPI:
@@ -27,14 +27,14 @@ class BiochemistryAPI:
     GIT_URL = "https://github.com/kbaseapps/BiochemistryAPI.git"
     GIT_COMMIT_HASH = "410765239da8490da9476411476beb7f2d60140d"
 
-    # BEGIN_CLASS_HEADER
+    #BEGIN_CLASS_HEADER
 
-    # END_CLASS_HEADER
+    #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
     # be found
     def __init__(self, config):
-        # BEGIN_CONSTRUCTOR
+        #BEGIN_CONSTRUCTOR
         self.config = config
         self.scratch = config["scratch"]
         data_dir = "/kb/module/data/"
@@ -62,7 +62,7 @@ class BiochemistryAPI:
         )
         self.structures = utils.make_mol_tuples(self.compounds.values())
         logging.info("Cached compound structures")
-        # END_CONSTRUCTOR
+        #END_CONSTRUCTOR
         pass
 
     def get_reactions(self, ctx, params):
@@ -93,7 +93,7 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_reactions
-        # BEGIN get_reactions
+        #BEGIN get_reactions
         logging.info("Starting get_reactions")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["reactions"])
@@ -105,7 +105,7 @@ class BiochemistryAPI:
                 rxn["aliases"] = self.rxn_aliases.get(id, "")
                 rxn["enzymes"] = self.ec_classes.get(id, "")
             out_reactions.append(rxn)
-        # END get_reactions
+        #END get_reactions
 
         # At some point might do deeper type checking...
         if not isinstance(out_reactions, list):
@@ -141,7 +141,7 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_compounds
-        # BEGIN get_compounds
+        #BEGIN get_compounds
         logging.info("Starting get_compounds")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["compounds"])
@@ -152,7 +152,7 @@ class BiochemistryAPI:
             if comp:
                 comp["aliases"] = self.comp_aliases.get(id, "")
             out_compounds.append(comp)
-        # END get_compounds
+        #END get_compounds
 
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
@@ -187,7 +187,7 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_compounds
-        # BEGIN search_compounds
+        #BEGIN search_compounds
         logging.info("Starting search_compounds")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["query"], ["limit"])
@@ -197,7 +197,7 @@ class BiochemistryAPI:
         if len(matching_ids) > limit:
             matching_ids = matching_ids[:limit]
         out_compounds = [self.compounds[cid] for cid in matching_ids]
-        # END search_compounds
+        #END search_compounds
 
         # At some point might do deeper type checking...
         if not isinstance(out_compounds, list):
@@ -235,7 +235,7 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: out_reactions
-        # BEGIN search_reactions
+        #BEGIN search_reactions
         logging.info("Starting search_reactions")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["query"], ["limit"])
@@ -245,7 +245,7 @@ class BiochemistryAPI:
         if len(matching_ids) > limit:
             matching_ids = matching_ids[:limit]
         out_reactions = [self.reactions[cid] for cid in matching_ids]
-        # END search_reactions
+        #END search_reactions
 
         # At some point might do deeper type checking...
         if not isinstance(out_reactions, list):
@@ -267,13 +267,13 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: matching_ids
-        # BEGIN substructure_search
+        #BEGIN substructure_search
         logging.info("Starting substructure_search")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["query"])
         matching_ids = utils.substructure_search(params["query"],
                                                  self.structures)
-        # END substructure_search
+        #END substructure_search
 
         # At some point might do deeper type checking...
         if not isinstance(matching_ids, list):
@@ -299,13 +299,13 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: matching_ids
-        # BEGIN similarity_search
+        #BEGIN similarity_search
         logging.info("Starting similarity_search")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["query"], ["fp_type", "min_similarity"])
         params["structures"] = self.structures
         matching_ids = utils.similarity_search(**params)
-        # END similarity_search
+        #END similarity_search
 
         # At some point might do deeper type checking...
         if not isinstance(matching_ids, list):
@@ -326,13 +326,13 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: depictions
-        # BEGIN depict_compounds
+        #BEGIN depict_compounds
         logging.info("Starting depict_compounds")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["structures"])
         depictions = [utils.depict_compound(struct)
                       for struct in params["structures"]]
-        # END depict_compounds
+        #END depict_compounds
 
         # At some point might do deeper type checking...
         if not isinstance(depictions, list):
@@ -358,7 +358,7 @@ class BiochemistryAPI:
         """
         # ctx is the context object
         # return variables are: output
-        # BEGIN calculate_3D_coords
+        #BEGIN calculate_3D_coords
         logging.info("Starting calculate_3D_coords")
         logging.info("Params: {}".format(params))
         utils.check_param(params, ["structures"])
@@ -370,7 +370,7 @@ class BiochemistryAPI:
             )
             for struct in params["structures"]
         ]
-        # END calculate_3D_coords
+        #END calculate_3D_coords
 
         # At some point might do deeper type checking...
         if not isinstance(output, list):
@@ -382,7 +382,7 @@ class BiochemistryAPI:
         return [output]
 
     def status(self, ctx):
-        # BEGIN_STATUS
+        #BEGIN_STATUS
         returnVal = {
             "state": "OK",
             "message": "",
@@ -390,5 +390,5 @@ class BiochemistryAPI:
             "git_url": self.GIT_URL,
             "git_commit_hash": self.GIT_COMMIT_HASH,
         }
-        # END_STATUS
+        #END_STATUS
         return [returnVal]
