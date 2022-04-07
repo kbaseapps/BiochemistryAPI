@@ -49,7 +49,6 @@ with open("compounds.tsv", "w") as cpd_fh:
             line_values.append(str(cpd[true_field]))
 
         cpd_fh.write("\t".join(line_values) + "\n")
-cpd_fh.close()
 
 #
 # Reactions
@@ -95,7 +94,6 @@ with open("reactions.tsv", "w") as rxn_fh:
             line_values.append(str(rxn[true_field]))
 
         rxn_fh.write("\t".join(line_values) + "\n")
-rxn_fh.close()
 
 #
 # Aliases
