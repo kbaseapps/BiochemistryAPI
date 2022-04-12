@@ -15,13 +15,14 @@ rdk_lg.setLevel(RDLogger.CRITICAL)
 logging.basicConfig(level=logging.INFO)
 ttable = str.maketrans("_-;", "   ", "()[]")
 
+
 def check_param(in_params, req_param, opt_param=list()):
     """
     Check if each of the params in the list are in the input params
     """
     for param in req_param:
         if param not in in_params:
-            raise ValueError('{} parameter is required'.format(param))
+            raise ValueError("{} parameter is required".format(param))
     defined_param = set(req_param + opt_param)
     for param in in_params:
         if param not in defined_param:
@@ -35,7 +36,7 @@ def _tokenize_string(raw_string):
     return normed_str.split() + [normed_str]
 
 
-def dict_from_file(path, key='id', dialect='excel-tab'):
+def dict_from_file(path, key="id", dialect="excel-tab"):
     """
     Build a dictionary from an object array in a file
     :param path: local path to object
@@ -52,20 +53,16 @@ def dict_from_file(path, key='id', dialect='excel-tab'):
         id_dict[line[key]] = line
         for tok in _tokenize_string(line[key]):
             alias_dict[tok].add(line[key])
-        for tok in _tokenize_string(line.get('name')):
+        for tok in _tokenize_string(line.get("name")):
             alias_dict[tok].add(line[key])
-        for tok in _tokenize_string(line.get('abbreviation')):
+        for tok in _tokenize_string(line.get("abbreviation")):
             alias_dict[tok].add(line[key])
-        for tok in _tokenize_string(line.get('ec_number')):
+        for tok in _tokenize_string(line.get("ec_number")):
             alias_dict[tok].add(line[key])
-        if line.get('aliases'):
-            for match in re.findall('"\S+?:(\S+?)"', line['aliases']):
-                for tok in _tokenize_string(match):
-                    alias_dict[tok].add(line[key])
     return id_dict, alias_dict
 
 
-def alias_dict_from_file(path, dialect='excel-tab'):
+def alias_dict_from_file(path, dialect="excel-tab"):
     """
     Build a dictionary from an object array in a file
     :param path: local path to object
@@ -76,12 +73,13 @@ def alias_dict_from_file(path, dialect='excel-tab'):
     with open(path) as infile:
         r = csv.DictReader(infile, dialect=dialect)
         for line in r:
-            for seed_id in line['MS ID'].split('|'):
-                if line['Source'] == 'Enzyme Class':
-                    alias_mappings[seed_id].append(line['External ID'])
+            for seed_id in line["MS ID"].split("|"):
+                if line["Source"] == "Enzyme Class":
+                    alias_mappings[seed_id].append(line["External ID"])
                 else:
-                    alias_mappings[seed_id].append('%s:%s' % (
-                        line['Source'].strip(), line['External ID']))
+                    alias_mappings[seed_id].append(
+                        "%s:%s" % (line["Source"].strip(), line["External ID"])
+                    )
     return alias_mappings
 
 
@@ -93,44 +91,63 @@ def _get_mol(structure):
     return mol
 
 
-def make_mol_tuples(compound_dict, id_key="id", struct_key='structure', struct_type='inchi'):
+def make_mol_tuples(
+    compound_dict, id_key="id", struct_key="structure", struct_type="inchi"
+):
     """
-    Creates named tuples with (compound_id, RDKit Mol Object) from a dict with SMILES or InChI
+    Creates named tuples with (compound_id, RDKit Mol Object)
+     from a dict with SMILES or InChI
     """
     MolTuple = namedtuple("MolTuple", "id mol maccs_fp rdkit_fp")
     tups = []
     for comp in compound_dict:
         mol = _get_mol(comp[struct_key])
         if mol:
-            tups.append(MolTuple(comp[id_key],
-                                 mol,
-                                 AllChem.GetMACCSKeysFingerprint(mol),
-                                 AllChem.RDKFingerprint(mol)))
+            tups.append(
+                MolTuple(
+                    comp[id_key],
+                    mol,
+                    AllChem.GetMACCSKeysFingerprint(mol),
+                    AllChem.RDKFingerprint(mol),
+                )
+            )
     return tups
 
 
 def substructure_search(query, structures):
     """Performs substructure search on 'query' in 'structures'"""
     pattern = AllChem.MolFromSmarts(query)
-    return [x.id for x in structures if x.mol and x.mol.HasSubstructMatch(pattern)]
+    return [x.id for x in structures
+            if x.mol and x.mol.HasSubstructMatch(pattern)]
 
 
-def similarity_search(query, structures, fp_type='maccs', min_similarity=0.8):
-    """Perform return compound ids where tanimoto similarity of fingerprint 'fp_type is greater
-    than 'min_similarity'"""
+def similarity_search(query, structures, fp_type="maccs", min_similarity=0.8):
+    """Perform return compound ids where tanimoto similarity of fingerprint
+     'fp_type is greater than 'min_similarity'"""
     if not isinstance(min_similarity, float) or not 0 <= min_similarity <= 1.0:
-        raise ValueError('Invalid min_similarity. Value must be a float between 0 and 1.')
-    if fp_type.lower() == 'maccs':
+        raise ValueError(
+            "Invalid min_similarity. Value must be a float between 0 and 1."
+        )
+    if fp_type.lower() == "maccs":
         fp1 = AllChem.GetMACCSKeysFingerprint(_get_mol(query))
-        return [x.id for x in structures
-                if FingerprintSimilarity(fp1, x.maccs_fp) >= min_similarity]
-    elif fp_type.lower() == 'rdkit':
+        return [
+            x.id
+            for x in structures
+            if FingerprintSimilarity(fp1, x.maccs_fp) >= min_similarity
+        ]
+    elif fp_type.lower() == "rdkit":
         fp1 = AllChem.RDKFingerprint(_get_mol(query))
-        return [x.id for x in structures
-                if FingerprintSimilarity(fp1, x.rdkit_fp) >= min_similarity]
+        return [
+            x.id
+            for x in structures
+            if FingerprintSimilarity(fp1, x.rdkit_fp) >= min_similarity
+        ]
     else:
-        fp_types = ", ".join(('maccs', 'rdkit'))
-        raise ValueError('Invalid fingerprint type: choose one of {}'.format(fp_types))
+        # NB: fp_type could also be Morgan
+        # but GetMorganFingerprint() is not yet implemented
+        fp_types = ", ".join(("maccs", "rdkit"))
+        raise ValueError("Invalid fingerprint type: "
+                         "choose one of {}".format(fp_types))
 
 
 def depict_compound(structure, size=(300, 300)):
@@ -147,10 +164,10 @@ def depict_compound(structure, size=(300, 300)):
     dwr = rdMolDraw2D.MolDraw2DSVG(*size)
     dwr.DrawMolecule(mol)
     dwr.FinishDrawing()
-    return dwr.GetDrawingText().replace('svg:', '')
+    return dwr.GetDrawingText().replace("svg:", "")
 
 
-def get_3d_mol(structure, output='mol', optimize=False):
+def get_3d_mol(structure, output="mol", optimize=False):
     mol = _get_mol(structure)
     if not mol:
         return ""
@@ -159,7 +176,7 @@ def get_3d_mol(structure, output='mol', optimize=False):
     if optimize:
         AllChem.MMFFOptimizeMolecule(mol)
     AllChem.RemoveHs(mol)
-    if output == 'mol':
+    if output == "mol":
         return AllChem.MolToMolBlock(mol)
-    if output == 'pdb':
+    if output == "pdb":
         return AllChem.MolToPDBBlock(mol)
