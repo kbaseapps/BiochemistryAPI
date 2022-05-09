@@ -59,6 +59,12 @@ def dict_from_file(path, key="id", dialect="excel-tab"):
             alias_dict[tok].add(line[key])
         for tok in _tokenize_string(line.get("ec_number")):
             alias_dict[tok].add(line[key])
+        if line.get("aliases"):
+            line['aliases'] = re.sub('[\[\'\]]','',line['aliases'])
+            for entry in line['aliases'].split(', '):
+                for match in re.findall('[:;] (\S+)', entry):
+                    for tok in _tokenize_string(match):
+                        alias_dict[tok].add(line[key])
     return id_dict, alias_dict
 
 
